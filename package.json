@@ -1,0 +1,20 @@
+{
+  "name": "VoxTrainingRoom",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "autoprefixer": "^8.0.0",
+    "babel-preset-env": "^1.6.1",
+    "cssnext": "^1.8.4",
+    "parcel-bundler": "^1.6.2",
+    "parcel-plugin-pug": "^0.2.5",
+    "postcss": "^4.1.16",
+    "postcss-discard-comments": "^4.0.0",
+    "postcss-modules": "^1.1.0",
+    "postcss-nested": "^3.0.0"
+  },
+  "scripts": {
+    "start": "parcel src/pug/index.pug",
+    "build": "parcel build src/pug/index.pug"
+  }
+}
