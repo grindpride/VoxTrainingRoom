@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(http-equiv="X-UA-Compatible", content="ie=edge")
+    link(rel="stylesheet", href="../css/style.pcss")
+    title Document
+  body
+    .container
+      aside.sidebar
+        .menu
+          .menu__title Menu
+          .menu__item
+            .menu__item-logo
+              include ../../public/svg/calendar.svg
+            | Calendar
+          .menu__item
+            .menu__item-logo
+              include ../../public/svg/documents.svg
+            | Documents
+          .menu__item 
+            .menu__item-logo
+              include ../../public/svg/events.svg 
+            | Events
+          .menu__item
+            .menu__item-logo
+              include ../../public/svg/email.svg
+            | Email
+          .menu__item
+            .menu__item-logo
+              include ../../public/svg/chat.svg
+            | Chat
+          .menu__item
+            .menu__item-logo
+              include ../../public/svg/settings.svg
+            | Settings
+      main.main
+      aside.sidebar-right
