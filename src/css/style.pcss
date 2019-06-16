@@ -22,68 +22,161 @@ body {
   height: 100vh;
 }
 
+.sidebar {
+  background: #eceff1;
+
+  .menu {
+    &__title {
+      padding-left: 60px;
+      margin-top: 120px;
+      margin-bottom: 26px;
+      font-size: 18px;
+      text-transform: uppercase;
+      color: var(--grey-blue);
+    }
+
+    &__item {
+      padding-left: 60px;
+      display: flex;
+      align-items: center;
+      color: var(--grey-blue);
+      height: 30px;
+      margin-bottom: 16px;
+      font-size: 16px;
+      font-weight: 500;
+      position: relative;
+
+      &-logo {
+        margin-right: 26px;
+
+        svg {
+          width: 18px;
+          height: 18px;
+          stroke: var(--grey-blue);
+        }
+      }
+
+      &:hover {
+        border-left: 3px solid var(--dar-blue);
+        cursor: pointer;
+        color: var(--dark-blue-100);
+
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0px;
+          background: var(--dark-blue-100);
+          width: 5px;
+          border-top-right-radius: 3px;
+          border-bottom-right-radius: 3px;
+          height: 120%;
+        }
+
+        svg {
+          stroke: var(--dark-blue-100);
+        }
+      }
+    }
+  }
+
+  &-right {
+    background: rgba(42, 46, 65, 0.7);
+  }
+}
+
 .main {
   background: var(--white);
 }
 
-.menu {
-  &__title {
-    padding-left: 60px;
-    margin-top: 100px;
-    margin-bottom: 26px;
+.content {
+  padding: 0px 60px;
+
+  &__schedule {
+    margin-top: 40px;
+  }
+}
+
+.schedule-appointemnt {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  &__time {
     font-size: 18px;
-    text-transform: uppercase;
-    color: var(--grey-blue);
+    color: #a4b0c3;
   }
 
-  &__item {
-    padding-left: 60px;
+  &__task {
     display: flex;
     align-items: center;
-    color: var(--grey-blue);
-    height: 30px;
-    margin-bottom: 16px;
-    font-size: 16px;
-    font-weight: 500;
-    position: relative;
+    color: var(--dark-blue-200);
+    padding-left: 68px;
+    position: absolute;
+    top: 50%;
+    left: 80px;
+    width: calc(100% - 80px);
+    font-weight: 600;
 
-    &-logo {
-      margin-right: 26px;
-
-      svg {
-        width: 18px;
-        height: 18px;
-        stroke: var(--grey-blue);
-      }
+    &_purple {
+      background: rgba(133, 118, 237, 0.15);
+      height: 100%;
+      border-left: 4px solid #8576ed;
     }
 
-    &:hover {
-      border-left: 3px solid var(--dar-blue);
-      cursor: pointer;
-      color: var(--dark-blue);
+    &_blue {
+      background: rgba(61, 131, 249, 0.15);
+      height: 250%;
+      border-left: 4px solid #3d83f9;
+    }
 
-      &::before {
-        content: '';
-        position: absolute;
-        left: 0px;
-        background: var(--dark-blue);
-        width: 5px;
-        border-top-right-radius: 3px;
-        border-bottom-right-radius: 3px;
-        height: 100%;
-      }
-
-      svg {
-        stroke: var(--dark-blue);
-      }
+    &_orange {
+      background: rgba(238, 165, 124, 0.15);
+      border-left: 4px solid #eea57c;
+      height: 200%;
     }
   }
 }
 
-.sidebar {
-  background: #eceff1;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 110px;
 
-  &-right {
-    background: rgba(42, 46, 65, 0.7);
+  &_border_white {
+    border-bottom: 2px solid #f3f3f3;
+  }
+
+  &_border_black {
+    border-bottom: 2px solid #000000;
+    opacity: 0.17;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  width: 60px;
+  justify-content: space-between;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    stroke: #8998b4;
+    cursor: pointer;
+
+    &:hover {
+      stroke: var(--dark-blue-100);
+    }
+  }
+}
+
+.title {
+  margin: 0;
+
+  &_dark-blue {
+    color: var(--dark-blue-200);
   }
 }
