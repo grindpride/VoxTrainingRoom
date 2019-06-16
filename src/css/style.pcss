@@ -42,7 +42,7 @@ body {
       color: var(--grey-blue);
       height: 30px;
       margin-bottom: 16px;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 500;
       position: relative;
 
@@ -89,7 +89,7 @@ body {
 }
 
 .content {
-  padding: 0px 60px;
+  padding: 0px 80px;
 
   &__schedule {
     margin-top: 40px;
@@ -144,15 +144,26 @@ body {
   align-items: center;
   width: 100%;
   height: 110px;
+  position: relative;
 
   &_border_white {
     border-bottom: 2px solid #f3f3f3;
   }
+}
 
-  &_border_black {
-    border-bottom: 2px solid #000000;
-    opacity: 0.17;
-  }
+.header_border_black::after,
+.calendar::after {
+  content: '';
+  width: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.17) 0% 50%,
+    rgba(255, 255, 255, 0.13) 50% 100%
+  );
+  position: absolute;
+  height: 4px;
+  bottom: 0;
+  opacity: 0.25;
 }
 
 .actions {
@@ -175,8 +186,104 @@ body {
 
 .title {
   margin: 0;
+  font-weight: normal;
+
+  &_white {
+    color: var(--white);
+  }
 
   &_dark-blue {
     color: var(--dark-blue-200);
+  }
+}
+
+.arrow {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  transform: rotate(-45deg);
+  border-top: 2px solid var(--white);
+  border-left: 2px solid var(--white);
+
+  &_right {
+    transform: rotate(135deg);
+  }
+}
+
+.calendar {
+  padding: 30px 10px 48px 10px;
+  font-size: 18px;
+  color: var(--white);
+  position: relative;
+
+  &__weekdays,
+  &__monthdays {
+    margin: 0;
+    padding: 30px 0;
+    display: flex;
+    list-style: none;
+    justify-content: space-between;
+  }
+
+  li {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.weekday,
+    &.monthday_next-month {
+      opacity: 0.6;
+    }
+
+    &.monthday:hover {
+      cursor: pointer;
+      background: #3c82f9;
+      transform: scale(1.8);
+      border-radius: 50%;
+
+      span {
+        transform: scale(0.6);
+      }
+    }
+  }
+}
+
+.categories {
+  &__title {
+    color: var(--white);
+    margin: 60px 0 40px 0;
+  }
+}
+
+.categories-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: space-between;
+
+  .category {
+    padding: 12px 16px;
+    height: 50px;
+    border-radius: 5px;
+    border-width: 0;
+    text-transform: uppercase;
+    width: 48%;
+    font-size: 14px;
+    color: var(--white);
+    margin-bottom: 20px;
+
+    &_purple {
+      background: #8576ed;
+    }
+
+    &_orange {
+      background: #f39946;
+    }
+
+    &_pink {
+      background: #ff467e;
+    }
   }
 }
