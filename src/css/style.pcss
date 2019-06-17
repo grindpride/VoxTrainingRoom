@@ -102,9 +102,24 @@ body {
   align-items: center;
   position: relative;
 
+  &__desc {
+    margin-left: 40px;
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+
   &__time {
     font-size: 16px;
     color: #a4b0c3;
+
+    &-line {
+      height: 2px;
+      background: #f3f3f3;
+      width: 100%;
+      position: absolute;
+      top: 50%;
+    }
   }
 
   &__task {
@@ -115,9 +130,9 @@ body {
     padding-left: 68px;
     position: absolute;
     top: 50%;
-    left: 80px;
-    width: calc(100% - 80px);
     font-weight: 600;
+    width: 100%;
+    z-index: 2;
 
     &_purple {
       background: rgba(133, 118, 237, 0.15);
