@@ -6,73 +6,15 @@ aside.sidebar-right
       .arrow.arrow_right
     .calendar
       ul.calendar__weekdays
-        li.weekday M
-        li.weekday T
-        li.weekday W
-        li.weekday T
-        li.weekday F
-        li.weekday Sat
-        li.weekday Sun
-      ul.calendar__monthdays
-        li.monthday 
-          span 1
-        li.monthday 
-          span 2
-        li.monthday 
-          span 3
-        li.monthday 
-          span 4
-        li.monthday 
-          span 5
-        li.monthday 
-          span 6
-        li.monthday 
-          span 7
-      ul.calendar__monthdays
-        li.monthday 
-          span 8
-        li.monthday 
-          span 9
-        li.monthday 
-          span 10
-        li.monthday 
-          span 11
-        li.monthday 
-          span 12
-        li.monthday 
-          span 13
-        li.monthday 
-          span 14
-      ul.calendar__monthdays
-        li.monthday 
-          span 15
-        li.monthday 
-          span 16
-        li.monthday 
-          span 17
-        li.monthday 
-          span 18
-        li.monthday 
-          span 19
-        li.monthday 
-          span 20
-        li.monthday 
-          span 21
-      ul.calendar__monthdays
-        li.monthday 
-          span 22
-        li.monthday 
-          span 23
-        li.monthday 
-          span 24
-        li.monthday 
-          span 25
-        li.monthday 
-          span 26
-        li.monthday 
-          span 27
-        li.monthday 
-          span 28
+        each val in ['M', 'T', 'W', 'T', 'F', 'Sat', 'Sun']
+          li.weekday= val
+      - var daysCount = 1
+      while daysCount <= 28
+        ul.calendar__monthdays
+          - var daysInWeekCount = 0
+          while daysInWeekCount < 7 && daysCount <= 28
+            li.monthday
+              span(class=daysInWeekCount++)= daysCount++
       ul.calendar__monthdays
         li.monthday 
           span 29
