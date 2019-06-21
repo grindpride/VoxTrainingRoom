@@ -1,6 +1,7 @@
 node_modules
-/dist
+
 .cache
+dist
 
 # Log files
 npm-debug.log*
@@ -15,3 +16,4 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+
