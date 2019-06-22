@@ -1,34 +1,34 @@
 aside.sidebar-right
     .header.header_border_black
-      .arrow
+      .arrow.arrow_left
       h3.title.title_white  March 2018
       .arrow.arrow_right
     .calendar
       ul.calendar__weekdays
         each val in ['M', 'T', 'W', 'T', 'F', 'Sat', 'Sun']
           li.weekday= val
-      - var daysCount = 1
-      while daysCount <= 28
-        ul.calendar__monthdays
-          - var daysInWeekCount = 0
-          while daysInWeekCount < 7 && daysCount <= 28
-            li.monthday
-              span(class=daysInWeekCount++)= daysCount++
-      ul.calendar__monthdays
-        li.monthday 
-          span 29
-        li.monthday 
-          span 30
-        li.monthday_next-month 
-          span 1
-        li.monthday_next-month 
-          span 2
-        li.monthday_next-month 
-          span 3
-        li.monthday_next-month 
-          span 4
-        li.monthday_next-month 
-          span 5
+      //- - var daysCount = 1
+      //- while daysCount <= 28
+      //-   ul.calendar__monthdays
+      //-     - var daysInWeekCount = 0
+      //-     while daysInWeekCount < 7 && daysCount <= 28
+      //-       li.monthday
+      //-         span(class=daysInWeekCount++)= daysCount++
+      //- ul.calendar__monthdays
+      //-   li.monthday 
+      //-     span 29
+      //-   li.monthday 
+      //-     span 30
+      //-   li.monthday_next-month 
+      //-     span 1
+      //-   li.monthday_next-month 
+      //-     span 2
+      //-   li.monthday_next-month 
+      //-     span 3
+      //-   li.monthday_next-month 
+      //-     span 4
+      //-   li.monthday_next-month 
+      //-     span 5
     .categories
       p.categories__title Your categories
       .categories-buttons

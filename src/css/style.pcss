@@ -251,11 +251,13 @@ body {
     font-size: 16px;
 
     &.weekday,
-    &.monthday_next-month {
+    &.monthday.next span,
+    &.monthday.prev span {
       opacity: 0.6;
     }
 
-    &.monthday:hover {
+    &.monthday:hover,
+    &.monthday.active {
       cursor: pointer;
       background: #3c82f9;
       transform: scale(1.8);
@@ -307,6 +309,6 @@ body {
   }
 }
 
-.sidebar-right{
+.sidebar-right {
   padding: 0 35px;
 }
