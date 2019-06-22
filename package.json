@@ -4,12 +4,13 @@
   "main": "index.js",
   "dependencies": {
     "autoprefixer": "^8.0.0",
-    "babel-preset-env": "^1.6.1",
+    "babel-preset-env": "^1.7.0",
     "cssnext": "^1.8.4",
-    "parcel-bundler": "^1.6.2",
-    "parcel-plugin-pug": "^0.2.5",
+    "parcel-bundler": "^1.12.3",
     "postcss": "^4.1.16",
     "postcss-discard-comments": "^4.0.0",
+    "postcss-focus": "^4.0.0",
+    "postcss-mixins": "^6.2.1",
     "postcss-modules": "^1.1.0",
     "postcss-nested": "^3.0.0"
   },
@@ -19,7 +20,12 @@
   },
   "devDependencies": {
     "css-mqpacker": "^7.0.0",
-    "postcss-focus": "^4.0.0",
-    "postcss-mixins": "^6.2.1"
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^5.0.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.13.0",
+    "pug": "^2.0.4"
   }
 }
