@@ -1,9 +1,11 @@
 class CalendarUI {
-  static init(calendar) {
+  static init(calendar, scheduleUI) {
     this.$sidebar = document.querySelector('.sidebar-right');
     this.$calendarTitle = this.$sidebar.querySelector('.title');
     this.$calendar = this.$sidebar.querySelector('.calendar');
     this.calendar = calendar;
+
+    this.$scheduleUI = scheduleUI;
 
     CalendarUI.addSwitchDateListener();
     CalendarUI.addSwitchMonthListener();
@@ -71,6 +73,7 @@ class CalendarUI {
         if ($newCurrentDate) {
           $newCurrentDate.classList.add('active');
           this.calendar.setNewDate();
+          this.$scheduleUI.setTitle();
         }
       }
     });
