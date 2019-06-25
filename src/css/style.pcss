@@ -160,10 +160,15 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 110px;
+  height: 96px;
   position: relative;
 
   &_border_white {
+    background: var(--white);
+    top: 0;
+    z-index: 3;
+    position: sticky;
+    border-bottom: 2px solid #f3f3f3;
     border-bottom: 2px solid #f3f3f3;
   }
 }

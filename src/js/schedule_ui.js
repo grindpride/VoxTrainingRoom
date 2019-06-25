@@ -41,9 +41,9 @@ class ScheduleUI {
 
       el.addEventListener('mousemove', e => {
         if ($activeTask) {
-          /*  if (parseInt(e.clientY, 10) < parseInt($activeTask.style.top, 10)) {
-            $activeTask.style.top = `${e.clientY}px`;
-          } */
+           if (parseInt(e.clientY, 10) < parseInt(startingPoint, 10)) {
+            $activeTask.style.bottom = `${e.clientY}px`;
+          }
 
           const height = Math.abs(startingPoint - e.clientY);
 
