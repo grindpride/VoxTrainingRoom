@@ -3,6 +3,8 @@ class CalendarUI {
     this.$sidebar = document.querySelector('.sidebar-right');
     this.$calendarTitle = this.$sidebar.querySelector('.title');
     this.$calendar = this.$sidebar.querySelector('.calendar');
+    this.$daysUl = this.$calendar.querySelector('.calendar__monthdays');
+
     this.calendar = calendar;
 
     this.$scheduleUI = scheduleUI;
@@ -10,6 +12,7 @@ class CalendarUI {
     CalendarUI.addSwitchDateListener();
     CalendarUI.addSwitchMonthListener();
     CalendarUI.render();
+    this.$calendarTitle.textContent = this.calendar.getCalendarTitle();
   }
 
   static addSwitchMonthListener() {
@@ -83,47 +86,26 @@ class CalendarUI {
     const $fragment = document.createDocumentFragment();
     const daysToDisplay = this.calendar.getMonthDaysToDisplay();
 
-    [...daysToDisplay]
-      .reduce(($elems, { day, isCurrentDate, month }, ind) => {
-        const isNewWeek = ind === 0 || ind % 7 === 0;
+    [...daysToDisplay].forEach(({ day, isCurrentDate, month }) => {
+      const $li = document.createElement('li');
+      const $span = document.createElement('span');
 
-        const $li = document.createElement('li');
-        const $span = document.createElement('span');
+      $span.textContent = day;
 
-        $span.textContent = day;
+      $li.classList.add('monthday');
+      $li.classList.add(month);
 
-        $li.classList.add('monthday');
-        $li.classList.add(month);
+      if (isCurrentDate && month === 'current') {
+        $li.classList.add('active');
+      }
 
-        if (isCurrentDate) {
-          $li.classList.add('active');
-        }
+      $li.appendChild($span);
 
-        $li.appendChild($span);
+      $fragment.appendChild($li);
+    });
 
-        if (isNewWeek) {
-          const $ui = document.createElement('ul');
-
-          $ui.className = 'calendar__monthdays';
-          $ui.appendChild($li);
-
-          $elems.push($ui);
-        } else {
-          const [$ui] = $elems.slice(-1);
-          $ui.appendChild($li);
-        }
-
-        return $elems;
-      }, [])
-      .forEach($elem => {
-        $fragment.appendChild($elem);
-      });
-
-    document
-      .querySelectorAll('.calendar__monthdays')
-      .forEach(el => el.remove());
-
-    this.$calendar.appendChild($fragment);
+    this.$daysUl.innerHTML = '';
+    this.$daysUl.appendChild($fragment);
   }
 }
 

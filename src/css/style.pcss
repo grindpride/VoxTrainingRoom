@@ -229,7 +229,8 @@ body {
 }
 
 .calendar {
-  padding: 20px 10px 60px 10px;
+  padding: 20px 10px 30px 10px;
+  height: 460px;
   font-size: 18px;
   color: var(--white);
   position: relative;
@@ -237,10 +238,14 @@ body {
   &__weekdays,
   &__monthdays {
     margin: 0;
-    padding: 24px 0;
-    display: flex;
+    align-items: center;
+    padding: 22px 0;
     list-style: none;
-    justify-content: space-between;
+    display: grid;
+    grid-column-gap: 14px;
+    grid-row-gap: 32px;
+    justify-items: center;
+    grid-template-columns: repeat(7, 1fr);
   }
 
   li {
