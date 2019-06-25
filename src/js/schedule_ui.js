@@ -20,20 +20,25 @@ class ScheduleUI {
 
   static addScheduleEventListener() {
     let startingPoint = 0;
+    let top = 0;
     let $activeTask = null;
 
     Array.from(this.$tasks).forEach(el => {
       el.addEventListener('mousedown', event => {
         if (!$activeTask) {
           $activeTask = document.createElement('div');
+          const coords = el.getBoundingClientRect();
 
           $activeTask.classList.add('schedule-appointemnt__task');
-          $activeTask.classList.add('schedule-appointemnt__task_purple');
+          $activeTask.classList.add('schedule-appointemnt__task_default');
 
           $activeTask.style.height = 0;
-          // $activeTask.style.top = `${event.clientY}px`;
 
-          event.target.parentElement.appendChild($activeTask);
+          top = event.clientY - coords.top;
+
+          $activeTask.style.top = `${top}px`;
+
+          event.target.appendChild($activeTask);
 
           startingPoint = event.clientY;
         }
@@ -41,8 +46,10 @@ class ScheduleUI {
 
       el.addEventListener('mousemove', e => {
         if ($activeTask) {
-           if (parseInt(e.clientY, 10) < parseInt(startingPoint, 10)) {
-            $activeTask.style.bottom = `${e.clientY}px`;
+          if (parseInt(e.clientY, 10) < parseInt(startingPoint, 10)) {
+            const newTop = e.clientY - e.target.getBoundingClientRect().top;
+
+            $activeTask.style.top = `${newTop}px`;
           }
 
           const height = Math.abs(startingPoint - e.clientY);
