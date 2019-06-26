@@ -1,7 +1,7 @@
 class ScheduleUI {
   static init(schedule) {
-    this.$content = document.querySelector('.content');
-    this.$schedule = this.$content.querySelector('.content__schedule');
+    this.$main = document.querySelector('.main');
+    this.$schedule = this.$main.querySelector('.content__schedule');
     this.$tasks = this.$schedule.querySelectorAll(
       '.schedule-appointemnt__task'
     );
@@ -13,57 +13,55 @@ class ScheduleUI {
   }
 
   static setTitle() {
-    this.$content.querySelector(
-      '.title'
-    ).textContent = this.schedule.getTitle();
+    this.$main.querySelector('.title').textContent = this.schedule.getTitle();
   }
 
   static addScheduleEventListener() {
+    const containerTop =
+      this.$schedule.getBoundingClientRect().top + window.scrollY;
     let startingPoint = 0;
-    let top = 0;
     let $activeTask = null;
 
-    Array.from(this.$tasks).forEach(el => {
-      el.addEventListener('mousedown', event => {
-        if (!$activeTask) {
-          $activeTask = document.createElement('div');
-          const coords = el.getBoundingClientRect();
+    this.$schedule.addEventListener('mousedown', event => {
+      if (!$activeTask) {
+        $activeTask = document.createElement('div');
 
-          $activeTask.classList.add('schedule-appointemnt__task');
-          $activeTask.classList.add('schedule-appointemnt__task_default');
+        $activeTask.classList.add('schedule-appointemnt__task');
+        $activeTask.classList.add('schedule-appointemnt__task_default');
 
-          $activeTask.style.height = 0;
+        $activeTask.style.height = 0;
 
-          top = event.clientY - coords.top;
+        this.$schedule.appendChild($activeTask);
 
-          $activeTask.style.top = `${top}px`;
+        startingPoint = event.pageY - containerTop;
+        $activeTask.style.top = `${startingPoint}px`;
 
-          event.target.appendChild($activeTask);
-
-          startingPoint = event.clientY;
-        }
-      });
-
-      el.addEventListener('mousemove', e => {
-        if ($activeTask) {
-          if (parseInt(e.clientY, 10) < parseInt(startingPoint, 10)) {
-            const newTop = e.clientY - e.target.getBoundingClientRect().top;
-
-            $activeTask.style.top = `${newTop}px`;
-          }
-
-          const height = Math.abs(startingPoint - e.clientY);
-
-          $activeTask.style.height = `${height}px`;
-        }
-      });
-
-      el.addEventListener('mouseup', () => {
-        $activeTask = null;
-      });
-
-      // el.addEventListener('');
+        // console.log({ startingPoint, pageY: event.pageY, containerTop });
+      }
     });
+
+    this.$schedule.addEventListener('mousemove', e => {
+      if ($activeTask) {
+        if (
+          parseInt(e.pageY - containerTop, 10) < parseInt(startingPoint, 10)
+        ) {
+          $activeTask.style.top = `${e.pageY - containerTop}px`;
+        }
+
+        console.log($activeTask.style.top);
+
+        const height = Math.abs(startingPoint - e.pageY + containerTop);
+
+        $activeTask.style.height = `${height}px`;
+      }
+    });
+
+    this.$main.addEventListener('mouseup', () => {
+      console.log('ALL RIGHT');
+      $activeTask = null;
+    });
+
+    // el.addEventListener('');
   }
 }
 
