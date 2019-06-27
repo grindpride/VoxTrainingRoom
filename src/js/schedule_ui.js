@@ -19,10 +19,21 @@ class ScheduleUI {
   static addScheduleEventListener() {
     const containerTop =
       this.$schedule.getBoundingClientRect().top + window.scrollY;
+    const paddingHeight = parseInt(
+      window.getComputedStyle(this.$schedule).paddingTop,
+      10
+    );
+
     let startingPoint = 0;
     let $activeTask = null;
 
     this.$schedule.addEventListener('mousedown', event => {
+      const withinPadding = event.pageY - containerTop <= paddingHeight;
+
+      if (withinPadding) {
+        return false;
+      }
+
       if (!$activeTask) {
         $activeTask = document.createElement('div');
 
@@ -34,10 +45,11 @@ class ScheduleUI {
         this.$schedule.appendChild($activeTask);
 
         startingPoint = event.pageY - containerTop;
-        $activeTask.style.top = `${startingPoint}px`;
 
-        // console.log({ startingPoint, pageY: event.pageY, containerTop });
+        $activeTask.style.top = `${startingPoint + this.$schedule.scrollTop}px`;
       }
+
+      return true;
     });
 
     this.$schedule.addEventListener('mousemove', e => {
@@ -45,10 +57,10 @@ class ScheduleUI {
         if (
           parseInt(e.pageY - containerTop, 10) < parseInt(startingPoint, 10)
         ) {
-          $activeTask.style.top = `${e.pageY - containerTop}px`;
+          $activeTask.style.top = `${e.pageY -
+            containerTop +
+            this.$schedule.scrollTop}px`;
         }
-
-        console.log($activeTask.style.top);
 
         const height = Math.abs(startingPoint - e.pageY + containerTop);
 
@@ -56,12 +68,18 @@ class ScheduleUI {
       }
     });
 
+    /*     this.$schedule.addEventListener('scroll', e => {
+      if ($activeTask) {
+        console.log(e.target.scrollTop);
+        const height = Math.abs(e.target.scrollTop + containerTop);
+        // console.log({ height });
+        $activeTask.style.height = `${height}px`;
+      }
+    }); */
+
     this.$main.addEventListener('mouseup', () => {
-      console.log('ALL RIGHT');
       $activeTask = null;
     });
-
-    // el.addEventListener('');
   }
 }
 
