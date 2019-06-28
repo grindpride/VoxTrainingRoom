@@ -21,17 +21,7 @@
           label.input_label To
           .input
             input(pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]" value="20:00")
-      .form-group
-        .input-wrapper.select
-          label.input_label Event type
-          .input.input_select
-            input(disabled="true" value="Management")
-            i.close
-              include ../../public/svg/arrow.svg
-          .dropdown
-            ul
-              each val in ['Management', 'Finance', 'Design']
-                li= val
+      include ./components/select.pug
       .form-group
         .input-wrapper
           label.input_label Event Description

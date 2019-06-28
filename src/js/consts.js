@@ -12,3 +12,5 @@ export const monthNames = [
   'November',
   'December'
 ];
+
+export const categories = ['Management', 'Finance', 'Design'];
