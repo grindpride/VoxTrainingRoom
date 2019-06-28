@@ -5,19 +5,25 @@
       i.close-btn
         include ../../public/svg/cross.svg
     .modal__body
-      .form-group.full-length
+      .form-group
         .input-wrapper
           label.input_label Event name
           .input
             input.input_text(placeholder="Type something")
       .form-group
-        .input.input_time
+        .input-wrapper.input_time
           label.input_label From
           .input
             input(pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]" value="15:57")
         .hyphen-wrapper
           .hyphen
-        .input.input_time
+        .input-wrapper.input_time
           label.input_label To
           .input
             input(pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]" value="20:00")
+      .form-group
+        .input-wrapper.select
+          label.input_label Event type
+          .input
+
+

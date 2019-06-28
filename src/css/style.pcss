@@ -412,9 +412,7 @@ textarea {
   &__body {
     padding: 24px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
     grid-row-gap: 24px;
-    grid-row: auto;
   }
 }
 
@@ -426,10 +424,6 @@ textarea {
 .form-group {
   display: flex;
   align-items: center;
-}
-
-.form-group.full-length {
-  grid-column: 1 / span 2;
 }
 
 .hyphen {
@@ -456,6 +450,12 @@ textarea {
   background: var(--white);
   border: 1px solid #d8dce6;
 
+  &:active,
+  &:focus-within,
+  &:focus {
+    border-color: #6e42fe;
+  }
+
   &-wrapper {
     width: 100%;
   }
@@ -476,6 +476,6 @@ textarea {
   }
 
   &_time {
-    width: 63px;
+    width: 67px;
   }
 }
