@@ -24,6 +24,21 @@
       .form-group
         .input-wrapper.select
           label.input_label Event type
-          .input
+          .input.input_select
+            input(disabled="true" value="Management")
+            i.close
+              include ../../public/svg/arrow.svg
+          .dropdown
+            ul
+              each val in ['Management', 'Finance', 'Design']
+                li= val
+      .form-group
+        .input-wrapper
+          label.input_label Event Description
+          .input.textarea
+            textarea(placeholder="Your event description")
+    .modal__footer
+      button.btn.btn_save Save
+      button.btn.btn_cancel Cancel
 
 
