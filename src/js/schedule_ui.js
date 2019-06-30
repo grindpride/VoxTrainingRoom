@@ -1,12 +1,5 @@
-import ScheduleModal from './schedule_modal';
-
-const getMinutes = height => {
-  const minutes = Math.round((((100 * height) / 70) * 60) / 100);
-  return minutes >= 10 ? minutes : `0${minutes}`;
-};
-
 class ScheduleUI {
-  static init(schedule) {
+  static init(schedule, scheduleModal) {
     this.$main = document.querySelector('.main');
     this.$schedule = this.$main.querySelector('.content__schedule');
     this.$tasks = this.$schedule.querySelectorAll(
@@ -20,8 +13,8 @@ class ScheduleUI {
     this.timeSlotsCoords = ScheduleUI.getTimeSlotsCoords();
 
     this.schedule = schedule;
-
-    ScheduleModal.init();
+    this.$activeTask = null;
+    this.scheduleModal = scheduleModal;
 
     ScheduleUI.setTitle();
     ScheduleUI.addScheduleEventListener();
@@ -63,7 +56,6 @@ class ScheduleUI {
     );
 
     let startingPoint = 0;
-    let $activeTask = null;
 
     this.$schedule.addEventListener('mousedown', event => {
       const withinPadding = event.pageY - containerTop <= paddingHeight;
@@ -72,37 +64,38 @@ class ScheduleUI {
         return false;
       }
 
-      if (!$activeTask) {
-        $activeTask = document.createElement('div');
+      if (!this.$activeTask) {
+        this.$activeTask = document.createElement('div');
 
-        $activeTask.classList.add('schedule-appointemnt__task');
-        $activeTask.classList.add('schedule-appointemnt__task_default');
+        this.$activeTask.classList.add('schedule-appointemnt__task');
+        this.$activeTask.classList.add('schedule-appointemnt__task_default');
 
-        $activeTask.style.height = 0;
+        this.$activeTask.style.height = 0;
 
-        this.$schedule.appendChild($activeTask);
+        this.$schedule.appendChild(this.$activeTask);
 
         startingPoint = event.pageY - containerTop;
 
-        $activeTask.style.top = `${startingPoint + this.$schedule.scrollTop}px`;
+        this.$activeTask.style.top = `${startingPoint +
+          this.$schedule.scrollTop}px`;
       }
 
       return true;
     });
 
     this.$schedule.addEventListener('mousemove', e => {
-      if ($activeTask) {
+      if (this.$activeTask) {
         if (
           parseInt(e.pageY - containerTop, 10) < parseInt(startingPoint, 10)
         ) {
-          $activeTask.style.top = `${e.pageY -
+          this.$activeTask.style.top = `${e.pageY -
             containerTop +
             this.$schedule.scrollTop}px`;
         }
 
         const height = Math.abs(startingPoint - e.pageY + containerTop);
 
-        $activeTask.style.height = `${height}px`;
+        this.$activeTask.style.height = `${height}px`;
       }
     });
 
@@ -128,40 +121,52 @@ class ScheduleUI {
         });
       }
 
-      if ($activeTask) {
-        const height = parseInt($activeTask.style.height, 10);
+      if (this.$activeTask) {
+        const height = parseInt(this.$activeTask.style.height, 10);
 
         if (height) {
-          const top = parseInt($activeTask.style.top, 10);
+          const top = parseInt(this.$activeTask.style.top, 10);
           const bottom = top + height;
 
-          const { startTime, endTime } = ScheduleUI.getTimeByCoords({
-            top,
-            bottom
-          });
+          const { startTime, endTime } = this.schedule.getTimeByCoords(
+            this.timeSlotsCoords,
+            {
+              top,
+              bottom
+            }
+          );
 
-          ScheduleModal.setTimeInterval(startTime, endTime);
-          ScheduleModal.showModal();
+          this.scheduleModal.setTimeInterval(startTime, endTime);
+          this.scheduleModal.showModal();
         }
       }
-
-      $activeTask = null;
     });
   }
 
-  static getTimeByCoords({ top, bottom }) {
-    const [startTime, endTime] = [top, bottom].map(val => {
-      const timeCoords = this.timeSlotsCoords.reduce((prev, curr) => {
-        return prev.top <= val && val >= curr.top ? curr : prev;
-      });
+  static addScheduleEvent(startTime, endTime, event, category) {
+    const categoryLC = category.toLowerCase();
+    this.schedule.events.push({ startTime, endTime, event, category });
+    const { top, bottom } = this.schedule.getCoordsByTime(
+      this.timeSlotsCoords,
+      startTime,
+      endTime
+    );
 
-      const height = val - timeCoords.bottom + timeCoords.height;
-      const minutes = getMinutes(height);
+    this.$activeTask.style.top = `${top}px`;
+    this.$activeTask.style.height = `${bottom - top}px`;
 
-      return timeCoords.time.replace(':00', `:${minutes}`);
-    });
+    if (categoryLC) {
+      this.$activeTask.classList.remove('schedule-appointemnt__task_default');
+      this.$activeTask.classList.add(
+        `schedule-appointemnt__task_${categoryLC}`
+      );
+    }
 
-    return { startTime, endTime };
+    const $span = document.createElement('span');
+    $span.textContent = event;
+
+    this.$activeTask.appendChild($span);
+    this.$activeTask = null;
   }
 }
 

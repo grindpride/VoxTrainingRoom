@@ -156,31 +156,40 @@ ul {
     height: 100%;
     left: 0;
 
-    &_default {
+    &_default,
+    &_design,
+    &_finance,
+    &_management {
       position: absolute;
       width: calc(100% - 80px);
       margin-left: 80px;
+    }
 
+    &_default {
       opacity: 0.15;
       background: var(--grey-blue);
       border-left: 4px solid var(--dark-blue-100);
     }
 
-    &_purple {
+    &_finance {
       background: rgba(133, 118, 237, 0.15);
       border-left: 4px solid #8576ed;
     }
 
-    &_blue {
+    &_design {
       background: rgba(61, 131, 249, 0.15);
       height: 250%;
       border-left: 4px solid #3d83f9;
     }
 
-    &_orange {
+    &_management {
       background: rgba(238, 165, 124, 0.15);
       border-left: 4px solid #eea57c;
       height: 200%;
+    }
+
+    span {
+      margin-left: 35px;
     }
   }
 }
