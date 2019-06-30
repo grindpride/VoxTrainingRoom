@@ -1,26 +1,26 @@
-.modal-wrapper
+.modal-wrapper.hidden
   .modal
     .modal__header
       p.modal__title Add event
-      i.close-btn
+      i.close-icon
         include ../../public/svg/cross.svg
     .modal__body
       .form-group
         .input-wrapper
           label.input_label Event name
           .input
-            input.input_text(placeholder="Type something")
+            input.event-name(placeholder="Type something" required)
       .form-group
         .input-wrapper.input_time
           label.input_label From
           .input
-            input(pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]" value="15:57")
+            input.from-time(value="15:57" required)
         .hyphen-wrapper
           .hyphen
         .input-wrapper.input_time
           label.input_label To
           .input
-            input(pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]" value="20:00")
+            input.to-time(value="20:00" required)
       include ./components/select.pug
       .form-group
         .input-wrapper
@@ -28,7 +28,7 @@
           .input.textarea
             textarea(placeholder="Your event description")
     .modal__footer
-      button.btn.btn_save Save
+      button.btn.btn_save(type="submit" disabled) Save
       button.btn.btn_cancel Cancel
 
 

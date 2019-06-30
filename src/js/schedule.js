@@ -3,6 +3,8 @@ import { monthNames } from './consts';
 class Schedule {
   static init(calendar) {
     this.calendar = calendar;
+
+    this.events = [];
   }
 
   static getTitle() {
