@@ -77,6 +77,7 @@ class CalendarUI {
           $newCurrentDate.classList.add('active');
           this.calendar.setNewDate();
           this.$scheduleUI.setTitle();
+          this.$scheduleUI.clearEvents();
         }
       }
     });

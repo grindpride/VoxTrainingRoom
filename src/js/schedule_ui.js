@@ -168,6 +168,19 @@ class ScheduleUI {
     this.$activeTask.appendChild($span);
     this.$activeTask = null;
   }
+
+  static clearEvents() {
+    const $eventElements = [
+      this.$schedule.querySelectorAll('.schedule-appointemnt__task_default'),
+      this.$schedule.querySelectorAll('.schedule-appointemnt__task_management'),
+      this.$schedule.querySelectorAll('.schedule-appointemnt__task_design'),
+      this.$schedule.querySelectorAll('.schedule-appointemnt__task_finance')
+    ];
+
+    $eventElements.forEach($elList => {
+      Array.from($elList).forEach($el => $el.remove());
+    });
+  }
 }
 
 export default ScheduleUI;
