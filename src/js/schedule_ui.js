@@ -84,6 +84,12 @@ class ScheduleUI {
     });
 
     this.$schedule.addEventListener('mousemove', e => {
+      const withinPadding = e.pageY - containerTop <= paddingHeight;
+
+      if (withinPadding) {
+        return false;
+      }
+
       if (this.$activeTask) {
         if (
           parseInt(e.pageY - containerTop, 10) < parseInt(startingPoint, 10)
@@ -97,16 +103,18 @@ class ScheduleUI {
 
         this.$activeTask.style.height = `${height}px`;
       }
+
+      return true;
     });
 
-    /*     this.$schedule.addEventListener('scroll', e => {
-      if ($activeTask) {
-        console.log(e.target.scrollTop);
+    this.$schedule.addEventListener('scroll', e => {
+      if (this.$activeTask) {
         const height = Math.abs(e.target.scrollTop + containerTop);
-        // console.log({ height });
-        $activeTask.style.height = `${height}px`;
+        this.$activeTask.style.height = `${height}px`;
       }
-    }); */
+    });
+
+    // this.$schedule.addEventListener('mouseout', () => console.log('fu'));
 
     this.$main.addEventListener('mouseup', () => {
       const $activeTasks = document.querySelectorAll(
