@@ -16,6 +16,7 @@ class ScheduleModal {
     this.$fromTime = this.$modal.querySelector('.from-time');
     this.$toTime = this.$modal.querySelector('.to-time');
     this.$eventName = this.$modal.querySelector('.event-name');
+    this.$eventDesc = this.$modal.querySelector('.event-desc');
 
     this.scheduleUI = scheduleUI;
     this.select = select;
@@ -30,6 +31,7 @@ class ScheduleModal {
     ScheduleModal.scheduleUI.$activeTask = null;
 
     ScheduleModal.hideModal();
+    ScheduleModal.resetModal();
   }
 
   static addCloseModalEventHandlers() {
@@ -40,6 +42,12 @@ class ScheduleModal {
     this.$modal
       .querySelector('.btn_cancel')
       .addEventListener('click', ScheduleModal.cancelEvent);
+
+    document.addEventListener('keydown', e => {
+      if (e.keyCode === 27) {
+        ScheduleModal.cancelEvent();
+      }
+    });
   }
 
   static setTimeInterval(startTime, endTime) {
@@ -73,12 +81,15 @@ class ScheduleModal {
 
   static resetModal() {
     ScheduleModal.$eventName.value = '';
+    ScheduleModal.$eventDesc.value = '';
+    ScheduleModal.select.resetValue();
   }
 
   static saveEvent() {
     const { value: fromTime } = ScheduleModal.$fromTime;
     const { value: toTime } = ScheduleModal.$toTime;
     const { value: eventName } = ScheduleModal.$eventName;
+    const { value: eventDesc } = ScheduleModal.$eventDesc;
 
     ScheduleModal.hideModal();
 
@@ -86,6 +97,7 @@ class ScheduleModal {
       fromTime,
       toTime,
       eventName,
+      eventDesc,
       ScheduleModal.select.currentVal
     );
 

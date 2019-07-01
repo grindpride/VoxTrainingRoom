@@ -143,7 +143,7 @@ class ScheduleUI {
     });
   }
 
-  static addScheduleEvent(startTime, endTime, event, category) {
+  static addScheduleEvent(startTime, endTime, event, eventDesc, category) {
     const categoryLC = category.toLowerCase();
     this.schedule.events.push({ startTime, endTime, event, category });
     const { top, bottom } = this.schedule.getCoordsByTime(
@@ -162,10 +162,18 @@ class ScheduleUI {
       );
     }
 
-    const $span = document.createElement('span');
-    $span.textContent = event;
+    const $fragment = document.createDocumentFragment();
 
-    this.$activeTask.appendChild($span);
+    const $span = document.createElement('span');
+    const $p = document.createElement('p');
+
+    $p.textContent = event;
+    $span.textContent = eventDesc;
+
+    $fragment.appendChild($p);
+    $fragment.appendChild($span);
+
+    this.$activeTask.appendChild($fragment);
     this.$activeTask = null;
   }
 

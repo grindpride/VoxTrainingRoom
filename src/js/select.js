@@ -5,11 +5,17 @@ class Select {
     this.$icon = this.$input.querySelector('.icon');
 
     this.currentVal = this.$input.querySelector('input').value;
+    this.defaultValue = this.currentVal;
 
     Select.addItems(items);
     Select.toggleDropdown();
     Select.addCloseEvent();
     Select.changeItem();
+  }
+
+  static resetValue() {
+    Select.currentVal = Select.defaultValue;
+    Select.$input.querySelector('input').value = Select.currentVal;
   }
 
   static addItems(items) {

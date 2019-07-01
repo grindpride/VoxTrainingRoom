@@ -7,26 +7,26 @@
     .modal__body
       .form-group
         .input-wrapper
-          label.input_label Event name
+          label.input_label(for="event-name") Event name
           .input
-            input.event-name(placeholder="Type something" required)
+            input.event-name(placeholder="Type something" id="event-name" required)
       .form-group
         .input-wrapper.input_time
-          label.input_label From
+          label.input_label(for="from-time") From
           .input
-            input.from-time(value="15:57" required)
+            input.from-time(value="15:57" id="from-time" required)
         .hyphen-wrapper
           .hyphen
         .input-wrapper.input_time
-          label.input_label To
+          label.input_label(for="to-time") To
           .input
-            input.to-time(value="20:00" required)
+            input.to-time(value="20:00" id="to-time" required)
       include ./components/select.pug
       .form-group
         .input-wrapper
-          label.input_label Event Description
+          label.input_label(for="event-desc") Event Description
           .input.textarea
-            textarea(placeholder="Your event description")
+            textarea.event-desc(placeholder="Your event description" id="event-desc")
     .modal__footer
       button.btn.btn_save(type="submit" disabled) Save
       button.btn.btn_cancel Cancel
