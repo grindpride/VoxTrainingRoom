@@ -1,0 +1,94 @@
+<template lang="pug">
+  aside.left-sidebar
+    .menu
+      .menu__title Menu
+      .menu__item(v-for="{name, icon} in listItems")
+        .menu__item-logo
+          include ../../assets/svg/chat.svg
+        | {{name}}
+</template>
+
+<script lang="ts">
+  import {Component, Vue} from "vue-property-decorator";
+  import {SidebarItem} from "@/types";
+
+  @Component({
+    components: {}
+  })
+  export default class LeftSidebar extends Vue {
+    private listItems: SidebarItem[] = [
+      {name: "Calendar", icon: "calendar"},
+      {name: "Documents", icon: "documents"},
+      {name: "Events", icon: "events"},
+      {name: "Email", icon: "email"},
+      {name: "Chat", icon: "chat"},
+      {name: "Settings", icon: "settings"},
+    ];
+
+    private getIcongPath(iconName: string): string {
+      return require(`@/assets/svg/${iconName}.svg`);
+    }
+
+
+  }
+</script>
+
+<style lang="postcss">
+  .left-sidebar {
+    background: #eceff1;
+
+    .menu {
+      &__title {
+        padding-left: 60px;
+        margin-top: 120px;
+        margin-bottom: 26px;
+        font-size: 16px;
+        text-transform: uppercase;
+        color: var(--grey-blue);
+      }
+
+      &__item {
+        padding-left: 60px;
+        display: flex;
+        align-items: center;
+        color: var(--grey-blue);
+        height: 30px;
+        margin-bottom: 16px;
+        font-size: 16px;
+        font-weight: 500;
+        position: relative;
+
+        &-logo {
+          margin-right: 26px;
+
+          svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--grey-blue);
+          }
+        }
+
+        &:hover {
+          border-left: 3px solid var(--dar-blue);
+          cursor: pointer;
+          color: var(--dark-blue-100);
+
+          &::before {
+            content: '';
+            position: absolute;
+            left: 0px;
+            background: var(--dark-blue-100);
+            width: 5px;
+            border-top-right-radius: 3px;
+            border-bottom-right-radius: 3px;
+            height: 120%;
+          }
+
+          svg {
+            stroke: var(--dark-blue-100);
+          }
+        }
+      }
+    }
+  }
+</style>
