@@ -4,16 +4,17 @@
       .menu__title Menu
       .menu__item(v-for="{name, icon} in listItems")
         .menu__item-logo
-          include ../../assets/svg/chat.svg
+          SvgIcon(:name="icon")
         | {{name}}
 </template>
 
 <script lang="ts">
   import {Component, Vue} from "vue-property-decorator";
   import {SidebarItem} from "@/types";
+  import SvgIcon from "@/components/ui/SvgIcon.vue";
 
   @Component({
-    components: {}
+    components: {SvgIcon}
   })
   export default class LeftSidebar extends Vue {
     private listItems: SidebarItem[] = [
@@ -24,16 +25,10 @@
       {name: "Chat", icon: "chat"},
       {name: "Settings", icon: "settings"},
     ];
-
-    private getIcongPath(iconName: string): string {
-      return require(`@/assets/svg/${iconName}.svg`);
-    }
-
-
   }
 </script>
 
-<style lang="postcss">
+<style>
   .left-sidebar {
     background: #eceff1;
 
@@ -61,11 +56,11 @@
         &-logo {
           margin-right: 26px;
 
-          svg {
-            width: 18px;
-            height: 18px;
-            stroke: var(--grey-blue);
-          }
+          /*svg {*/
+          /*  width: 18px;*/
+          /*  height: 18px;*/
+          /*  stroke: var(--grey-blue);*/
+          /*}*/
         }
 
         &:hover {
