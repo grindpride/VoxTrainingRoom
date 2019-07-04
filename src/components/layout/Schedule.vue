@@ -10,11 +10,11 @@
           .layout-icon
             SvgIcon(name="layout")
       .schedule__content.vox-scroll
-        .schedule-appointemnt(v-for="hour in hours")
-          .schedule-appointemnt__time {{hour}}
-          .schedule-appointemnt__desc
-            .schedule-appointemnt__time-line
-            .schedule-appointemnt__task
+        .event(v-for="hour in hours")
+          .event__time {{hour}}
+          .event__desc
+            .event__time-line
+            .event__task
 </template>
 
 <script lang="ts">
@@ -51,6 +51,7 @@
     }
 
     &__date {
+      font-weight: normal;
       font-size: 20px;
       color: var(--dark-blue-200);
     }
@@ -80,97 +81,97 @@
         }
       }
     }
+  }
 
-    &-appointemnt {
-      height: 70px;
+  .event {
+    height: 70px;
+    display: flex;
+    align-items: center;
+
+    &__desc {
+      margin-left: 40px;
+      height: 100%;
+      width: 100%;
+    }
+
+    &__time {
+      align-self: flex-start;
+      position: relative;
+      bottom: 8px;
+      font-size: 16px;
+      color: #a4b0c3;
+      user-select: none;
+    }
+
+    &__time-line {
+      height: 1px;
+      background: var(--gray-3);
+      width: 100%;
+    }
+
+    &__task {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--dark-blue-200);
+      font-weight: 600;
+      width: 100%;
+      z-index: 2;
+      height: 100%;
+      left: 0;
 
-      &__desc {
-        margin-left: 40px;
-        height: 100%;
-        width: 100%;
+      &_default,
+      &_design,
+      &_finance,
+      &_management {
+        position: absolute;
+        width: calc(100% - 80px);
+        margin-left: 80px;
       }
 
-      &__time {
-        align-self: flex-start;
-        position: relative;
-        bottom: 8px;
-        font-size: 16px;
-        color: #a4b0c3;
-        user-select: none;
-
-        &-line {
-          height: 1px;
-          background: var(--gray-3);
-          width: 100%;
-        }
+      &_default {
+        opacity: 0.15;
+        background: var(--grey-blue);
+        border-left: 4px solid var(--dark-blue-100);
       }
 
-      &__task {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: center;
+      &_finance {
+        background: rgba(133, 118, 237, 0.15);
+        border-left: 4px solid #8576ed;
+      }
+
+      &_design {
+        background: rgba(61, 131, 249, 0.15);
+        height: 250%;
+        border-left: 4px solid #3d83f9;
+      }
+
+      &_management {
+        background: rgba(238, 165, 124, 0.15);
+        border-left: 4px solid #eea57c;
+        height: 200%;
+      }
+
+      p,
+      span {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        margin-left: 35px;
+      }
+
+      p {
+        width: 260px;
         font-size: 18px;
-        color: var(--dark-blue-200);
-        font-weight: 600;
-        width: 100%;
-        z-index: 2;
-        height: 100%;
-        left: 0;
+      }
 
-        &_default,
-        &_design,
-        &_finance,
-        &_management {
-          position: absolute;
-          width: calc(100% - 80px);
-          margin-left: 80px;
-        }
-
-        &_default {
-          opacity: 0.15;
-          background: var(--grey-blue);
-          border-left: 4px solid var(--dark-blue-100);
-        }
-
-        &_finance {
-          background: rgba(133, 118, 237, 0.15);
-          border-left: 4px solid #8576ed;
-        }
-
-        &_design {
-          background: rgba(61, 131, 249, 0.15);
-          height: 250%;
-          border-left: 4px solid #3d83f9;
-        }
-
-        &_management {
-          background: rgba(238, 165, 124, 0.15);
-          border-left: 4px solid #eea57c;
-          height: 200%;
-        }
-
-        p,
-        span {
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          margin-left: 35px;
-        }
-
-        p {
-          width: 260px;
-          font-size: 18px;
-        }
-
-        span {
-          margin-top: 16px;
-          width: 310px;
-          font-size: 14px;
-          opacity: 0.7;
-        }
+      span {
+        margin-top: 16px;
+        width: 310px;
+        font-size: 14px;
+        opacity: 0.7;
       }
     }
   }

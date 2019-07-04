@@ -2,17 +2,20 @@
   div(id="app")
     LeftSidebar
     Schedule
+    RightSidebar
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-  import LeftSidebar from "@/components/layout/LeftSidebar.vue";
-  import Schedule from "@/components/layout/Schedule.vue";
+  import LeftSidebar from '@/components/layout/LeftSidebar.vue';
+  import Schedule from '@/components/layout/Schedule.vue'
+  import RightSidebar from '@/components/layout/RightSidebar.vue'
 
   @Component({
     components: {
       LeftSidebar,
-      Schedule
+      Schedule,
+      RightSidebar
     },
   })
   export default class App extends Vue {
