@@ -1,15 +1,18 @@
 <template lang="pug">
   div(id="app")
     LeftSidebar
+    Schedule
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
   import LeftSidebar from "@/components/layout/LeftSidebar.vue";
+  import Schedule from "@/components/layout/Schedule.vue";
 
   @Component({
     components: {
-      LeftSidebar
+      LeftSidebar,
+      Schedule
     },
   })
   export default class App extends Vue {
