@@ -201,7 +201,7 @@
 
 
     &__wrapper {
-      padding: 0px 80px;
+      padding: 0px 35px;
       background: rgba(42, 46, 65, 0.7);
     }
 
