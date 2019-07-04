@@ -55,16 +55,9 @@
 
         &-logo {
           margin-right: 26px;
-
-          /*svg {*/
-          /*  width: 18px;*/
-          /*  height: 18px;*/
-          /*  stroke: var(--grey-blue);*/
-          /*}*/
         }
 
         &:hover {
-          border-left: 3px solid var(--dar-blue);
           cursor: pointer;
           color: var(--dark-blue-100);
 
@@ -80,7 +73,7 @@
           }
 
           svg {
-            stroke: var(--dark-blue-100);
+            color: var(--dark-blue-100);
           }
         }
       }
