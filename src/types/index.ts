@@ -5,6 +5,6 @@ export interface SidebarItem {
 
 export interface MonthDay {
   day: number,
-  class: string,
+  className: string,
   isCurrentDate: boolean
 }
