@@ -22,6 +22,17 @@
     },
   })
   export default class App extends Vue {
+    mounted() {
+      window.addEventListener('click', this.emitWindowClick);
+    }
+
+    beforeDestroy() {
+      window.removeEventListener('click', this.emitWindowClick);
+    }
+
+    private emitWindowClick(e: Event) {
+      this.$root.$emit('window:click', e);
+    }
   }
 </script>
 

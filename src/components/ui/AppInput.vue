@@ -2,7 +2,7 @@
   .input__wrapper(:class="{input_short: short}")
     label.input__label(:for="id") {{label}}
     div.input(:class="{textarea: textarea}")
-      input-type(:is="inputType" :class="className" :placeholder="placeholder" :id="id")
+      input-type(:is="inputType" :placeholder="placeholder" :id="id")
 </template>
 
 <script lang="ts">

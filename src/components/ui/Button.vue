@@ -1,5 +1,5 @@
 <template lang="pug">
-  button.btn(:class="className") {{label}}
+  button.btn(:class="className" @click="$emit('click')") {{label}}
 </template>
 
 <script lang="ts">

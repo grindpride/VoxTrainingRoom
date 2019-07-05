@@ -1,5 +1,5 @@
 <template lang="pug">
-  .modal__wrapper
+  .modal__wrapper(v-show="open")
     .modal
       .modal__header
         p.modal__title Add event
@@ -12,13 +12,14 @@
           AppInput(placeholder="09:00" label="From" short="true")
           .hyphen__wrapper
             .hyphen
-          AppInput(placeholder="09:00" label="To" short="true")
-        SvgIcon(name="select")
+          AppInput(placeholder="23:00" label="To" short="true")
+        .form-group
+          AppSelect(:options="eventTypes" label="Event type")
         .form-group
           AppInput(placeholder="Your event description" label="Event" textarea="true")
       .modal__footer
         Button(label="Save" type="submit")
-        Button(label="Cancel")
+        Button(label="Cancel" @click="open = false")
 </template>
 
 <script lang="ts">
@@ -26,12 +27,29 @@
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import AppInput from '@/components/ui/AppInput.vue';
   import Button from '@/components/ui/Button.vue';
+  import AppSelect from "@/components/ui/AppSelect.vue";
+
+  import {SelectOption} from "@/types";
 
   @Component({
-    components: {SvgIcon, AppInput, Button}
+    components: {SvgIcon, AppInput, Button, AppSelect}
   })
   export default class AppModal extends Vue {
-
+    private open: boolean = true;
+    private eventTypes: SelectOption[] = [
+      {
+        name: 'Management',
+        value: 'Management'
+      },
+      {
+        name: 'Design',
+        value: 'Design'
+      },
+      {
+        name: 'Finance',
+        value: 'Finance'
+      }
+    ]
   }
 </script>
 
@@ -87,10 +105,6 @@
         margin-left: 8px;
       }
     }
-  }
-
-  .hidden {
-    display: none;
   }
 
   .close-icon {
