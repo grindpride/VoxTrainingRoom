@@ -1,21 +1,21 @@
 <template lang="pug">
   div(id="app")
-    Modal
+    AppModal
     LeftSidebar
-    Schedule
+    EventsSchedule
     RightSidebar
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
   import LeftSidebar from '@/components/layout/LeftSidebar.vue';
-  import EventsSchedule from '@/components/layout/EventsSchedule.vue'
-  import RightSidebar from '@/components/layout/RightSidebar.vue'
-  import AppModal from '@/components/AppModal.vue'
+  import EventsSchedule from '@/components/layout/EventsSchedule.vue';
+  import RightSidebar from '@/components/layout/RightSidebar.vue';
+  import AppModal from '@/components/AppModal.vue';
 
   @Component({
     components: {
-      Modal: AppModal,
+      AppModal,
       LeftSidebar,
       EventsSchedule,
       RightSidebar

@@ -17,17 +17,18 @@
         .form-group
           AppInput(placeholder="Your event description" label="Event" textarea="true")
       .modal__footer
-        button.btn.btn_save(type="submit" disabled) Save
-        button.btn.btn_cancel Cancel
+        Button(label="Save" type="submit")
+        Button(label="Cancel")
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import AppInput from '@/components/ui/AppInput.vue';
+  import Button from '@/components/ui/Button.vue';
 
   @Component({
-    components: {SvgIcon, AppInput}
+    components: {SvgIcon, AppInput, Button}
   })
   export default class AppModal extends Vue {
 

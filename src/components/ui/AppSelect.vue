@@ -1,5 +1,5 @@
 <template lang="pug">
-  .select
+  .input__wrapper.select
     label.input_label Event type
     .input.input_select
       input(disabled="true" value="Management")
