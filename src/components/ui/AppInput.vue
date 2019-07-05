@@ -1,0 +1,93 @@
+<template lang="pug">
+  .input__wrapper(:class="{input_short: short}")
+    label.input__label(:for="id") {{label}}
+    div.input(:class="{textarea: textarea}")
+      input-type(:is="inputType" :class="className" :placeholder="placeholder" :id="id")
+</template>
+
+<script lang="ts">
+  import {Component, Prop, Vue} from 'vue-property-decorator';
+
+  const idGenerator = (): Function => {
+    const ids: string[] = [];
+
+    return function generate(): string {
+      const newId: string = Math.random().toString(10).substring(2, 5) + Math.random().toString(10).substring(2, 5);
+
+      if (!ids.includes((newId))) {
+        ids.push(newId);
+        return newId;
+      }
+
+      return generate();
+    }
+  };
+
+  const generateId: Function = idGenerator();
+
+  @Component
+  export default class AppInput extends Vue {
+    @Prop({default: ''}) placeholder: string;
+    @Prop() label!: string;
+    @Prop() short: boolean;
+    @Prop() textarea: boolean;
+
+
+    private get inputType(): string {
+      if (this.textarea) {
+        return 'textarea';
+      }
+
+      return 'input';
+    }
+
+    private get id(): string {
+      return `input-${generateId()}`;
+    }
+  }
+</script>
+
+<style>
+  .input {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    height: 40px;
+    font-size: 12px;
+    padding: 10px 16px;
+    justify-content: space-between;
+    background: var(--white);
+    border: 1px solid var(--gray-2);
+
+    &:active,
+    &.active,
+    &:focus-within,
+    &:focus {
+      border-color: #6e42fe;
+    }
+
+    &__wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    &__label {
+      font-weight: 500;
+      font-size: 12px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    &_short {
+      width: 67px;
+    }
+  }
+
+  .textarea {
+    font-size: 12px;
+    padding-top: 16px;
+    height: 148px;
+  }
+
+</style>
