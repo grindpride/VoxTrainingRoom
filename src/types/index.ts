@@ -8,3 +8,8 @@ export interface MonthDay {
   className: string,
   isCurrentDate: boolean
 }
+
+export interface SelectOption {
+  value: string | number,
+  name: string
+}
