@@ -8,7 +8,7 @@
       ul.calendar__weekdays
         li.weekday(v-for="weekday in weekDays") {{weekday}}
       ul.calendar__monthdays
-        li.monthday(v-for="{day, isCurrentDate, className} in getMonthDaysToDisplay()" :class="{active: isCurrentDate, [className]: true}")
+        li.monthday(v-for="{day, isCurrentDate, className} in daysToDisplay" :class="{active: isCurrentDate, [className]: true}")
           span {{day}}
     .categories__wrapper
       p.categories__title Your categories
@@ -72,8 +72,10 @@
     return 7 - weekday;
   };
 
-  @Component
-  export default class extends Vue {
+  @Component({
+    components: {}
+  })
+  export default class RightSidebar extends Vue {
     private weekDays: string[] = ['M', 'T', 'W', 'T', 'F', 'Sat', 'Sun'];
     private date: Date = new Date();
 
@@ -90,7 +92,7 @@
     }
 
 
-    private get getMonthDaysToDisplay(): MonthDay[] {
+    private get daysToDisplay(): MonthDay[] {
       const now: Date = new Date();
       const month = this.date.getMonth();
 
