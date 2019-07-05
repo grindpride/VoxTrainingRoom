@@ -72,9 +72,7 @@
     return 7 - weekday;
   };
 
-  @Component({
-    components: {}
-  })
+  @Component
   export default class extends Vue {
     private weekDays: string[] = ['M', 'T', 'W', 'T', 'F', 'Sat', 'Sun'];
     private date: Date = new Date();
@@ -92,7 +90,7 @@
     }
 
 
-    private getMonthDaysToDisplay(): MonthDay[] {
+    private get getMonthDaysToDisplay(): MonthDay[] {
       const now: Date = new Date();
       const month = this.date.getMonth();
 
