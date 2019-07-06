@@ -21,56 +21,15 @@
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
   import {MonthDay} from '@/types/index';
+  import {monthNames} from "@/consts";
+  import {getDaysInMonth, getNextMonthDaysToDisplay, getPrevMonthDaysToDisplay, range} from "@/helpers";
 
-  const monthNames: string[] = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ];
 
   enum MonthTypes {
     Prev = 'prev',
     Current = 'current',
     Next = 'next'
   }
-
-  const getDaysInMonth = (month: number): number => {
-    const date = new Date();
-
-    return new Date(date.getFullYear(), month + 1, 0).getDate();
-  };
-
-  const range = (start: number, end: number): number[] => {
-    return [...Array(end + 1).keys()].slice(start);
-  };
-
-  const getPrevMonthDaysToDisplay = (weekday: number): number => {
-    switch (weekday) {
-      case 0:
-        return 6;
-      case 1:
-        return 7;
-      default:
-        return weekday - 1;
-    }
-  };
-
-  const getNextMonthDaysToDisplay = (weekday: number): number => {
-    if (weekday === 0) {
-      return 7;
-    }
-
-    return 7 - weekday;
-  };
 
   @Component({
     components: {}
