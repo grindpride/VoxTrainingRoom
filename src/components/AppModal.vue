@@ -77,6 +77,10 @@
       height: 100%;
     }
 
+    &__title {
+      font-weight: 500;
+    }
+
     &__header {
       min-height: 56px;
       font-size: 18px;

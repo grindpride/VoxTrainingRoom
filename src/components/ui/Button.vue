@@ -38,7 +38,7 @@
     border: 1px solid transparent;
     display: flex;
     font-size: 12px;
-    font-weight: normal;
+    font-weight: 500;
     justify-content: center;
     align-items: center;
     border-radius: 4px;
