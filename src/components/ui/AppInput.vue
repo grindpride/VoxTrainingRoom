@@ -7,7 +7,7 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator';
-  import {idGenerator} from "@/helpers";
+  import {idGenerator} from "@/lib/helpers";
 
   const generateId: Function = idGenerator();
 

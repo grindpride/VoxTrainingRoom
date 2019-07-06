@@ -10,7 +10,7 @@
 
 <script lang="ts">
   import {Component, Vue} from "vue-property-decorator";
-  import {SidebarItem} from "@/types";
+  import {SidebarItem} from "@/lib/types";
   import SvgIcon from "@/components/ui/SvgIcon.vue";
 
   @Component({

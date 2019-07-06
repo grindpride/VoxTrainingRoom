@@ -13,7 +13,7 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator';
   import SvgIcon from "@/components/ui/SvgIcon.vue";
-  import {SelectOption} from "@/types";
+  import {SelectOption} from "@/lib/types";
 
 
   @Component({

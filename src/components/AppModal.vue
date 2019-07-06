@@ -1,5 +1,5 @@
 <template lang="pug">
-  .modal__wrapper(v-show="open")
+  .modal__wrapper(v-if="open")
     .modal
       .modal__header
         p.modal__title Add event
@@ -29,13 +29,13 @@
   import Button from '@/components/ui/Button.vue';
   import AppSelect from "@/components/ui/AppSelect.vue";
 
-  import {SelectOption} from "@/types";
+  import {SelectOption} from "@/lib/types";
 
   @Component({
     components: {SvgIcon, AppInput, Button, AppSelect}
   })
   export default class AppModal extends Vue {
-    private open: boolean = true;
+    private open: boolean = false;
     private eventTypes: SelectOption[] = [
       {
         name: 'Management',

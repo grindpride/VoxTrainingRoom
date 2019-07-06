@@ -4,11 +4,9 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator';
+  import {ButtonTypes} from "@/lib/enums";
 
-  enum ButtonTypes {
-    Submit = 'submit',
-    Default = 'default'
-  }
+
 
   @Component
   export default class AppSelect extends Vue {
