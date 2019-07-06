@@ -1,3 +1,5 @@
+import {MonthTypes} from "@/lib/enums";
+
 export interface SidebarItem {
   name: string;
   icon?: string;
@@ -5,7 +7,7 @@ export interface SidebarItem {
 
 export interface MonthDay {
   day: number,
-  className: string,
+  month: MonthTypes,
   isCurrentDate: boolean
 }
 
