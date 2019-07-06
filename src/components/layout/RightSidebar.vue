@@ -1,14 +1,20 @@
+import {MonthTypes} from "../../lib/enums";
+import {MonthTypes} from "../../lib/enums";
 <template lang="pug">
   aside.calendar__wrapper
     .calendar__header
-      .arrow.arrow_left
+      .arrow.arrow_left(@click="changeMonth(-1)")
       h3.calendar__month  {{monthTitle}}
-      .arrow.arrow_right
+      .arrow.arrow_right(@click="changeMonth(1)")
     .calendar
       ul.calendar__weekdays
         li.weekday(v-for="weekday in weekDays") {{weekday}}
       ul.calendar__monthdays
-        li.monthday(v-for="{day, isCurrentDate, className} in daysToDisplay" :class="{active: isCurrentDate, [className]: true}")
+        li.monthday(
+          v-for="{day, isCurrentDate, month} in daysToDisplay"
+          :class="{active: isCurrentDate, [month]: true}"
+          :key="day + month"
+          @click="changeCurrentDate(day, month)")
           span {{day}}
     .categories__wrapper
       p.categories__title Your categories
@@ -20,16 +26,11 @@
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-  import {MonthDay} from '@/types/index';
-  import {monthNames} from "@/consts";
-  import {getDaysInMonth, getNextMonthDaysToDisplay, getPrevMonthDaysToDisplay, range} from "@/helpers";
+  import {MonthDay} from '@/lib/types';
+  import {monthNames} from "@/lib/consts";
+  import {getDaysInMonth, getNextMonthDaysToDisplay, getPrevMonthDaysToDisplay, range} from "@/lib/helpers";
+  import {MonthTypes} from "@/lib/enums";
 
-
-  enum MonthTypes {
-    Prev = 'prev',
-    Current = 'current',
-    Next = 'next'
-  }
 
   @Component({
     components: {}
@@ -38,20 +39,14 @@
     private weekDays: string[] = ['M', 'T', 'W', 'T', 'F', 'Sat', 'Sun'];
     private date: Date = new Date();
 
-    private get currentMonth(): number {
-      return this.date.getMonth();
-    }
-
-    private get currentDate(): number {
-      return this.date.getDate();
-    }
+    private currentMonth: number = this.date.getMonth();
+    private currentDate: number = this.date.getDate();
 
     get monthTitle(): string {
       return `${monthNames[this.date.getMonth()]} ${this.date.getFullYear()}`;
     }
 
-
-    private get daysToDisplay(): MonthDay[] {
+    get daysToDisplay(): MonthDay[] {
       const now: Date = new Date();
       const month = this.date.getMonth();
 
@@ -84,14 +79,14 @@
         .slice(-prevMonthDaysToDisplay)
         .map(day => ({
           day,
-          className: MonthTypes.Prev,
+          month: MonthTypes.Prev,
           isCurrentDate:
             prevMonth === this.currentMonth && day === this.currentDate
         }));
 
       const currentMonthDays: MonthDay[] = range(1, daysInCurrentMonth).map(day => ({
         day,
-        className: MonthTypes.Current,
+        month: MonthTypes.Current,
         isCurrentDate:
           this.date.getMonth() === this.currentMonth && day === this.currentDate
       }));
@@ -100,7 +95,7 @@
         .slice(0, lastMonthDaysToDisplay)
         .map(day => ({
           day,
-          className: MonthTypes.Next,
+          month: MonthTypes.Next,
           isCurrentDate:
             nextMonth === this.currentMonth && day === this.currentDate
         }));
@@ -108,6 +103,21 @@
       return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
     }
 
+    changeMonth(offset: number): void {
+      this.date = new Date(this.date.setMonth(this.date.getMonth() + offset));
+    }
+
+    changeCurrentDate(day: number, month: MonthTypes): void {
+      if (month === MonthTypes.Prev) {
+        this.changeMonth(-1);
+      } else if (month === MonthTypes.Next) {
+        this.changeMonth(1);
+      }
+
+      this.date = new Date(this.date.setDate(day));
+      this.currentMonth = this.date.getMonth();
+      this.currentDate = this.date.getDate();
+    }
   }
 </script>
 
@@ -232,5 +242,16 @@
     }
   }
 
+  .arrow {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    transform: rotate(-45deg);
+    border-top: 2px solid var(--white);
+    border-left: 2px solid var(--white);
 
+    &_right {
+      transform: rotate(135deg);
+    }
+  }
 </style>
