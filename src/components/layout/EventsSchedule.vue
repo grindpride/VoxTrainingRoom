@@ -9,7 +9,7 @@
             SvgIcon(name="search")
           .layout-icon
             SvgIcon(name="layout")
-      .schedule__content.vox-scroll
+      .schedule__content.vox-scroll(@mouseup="openModal")
         .event(v-for="hour in hours")
           .event__time {{hour}}
           .event__desc
@@ -30,6 +30,9 @@
       "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
     ];
 
+    openModal(e: Event): void {
+      this.$root.$emit('openmodal', e);
+    }
   }
 </script>
 

@@ -1,9 +1,9 @@
 <template lang="pug">
-  .modal__wrapper(v-if="open")
+  .modal__wrapper(v-if="isOpen")
     .modal
       .modal__header
         p.modal__title Add event
-        i.close-icon
+        i.close-icon(@click="close")
           SvgIcon(name="cross")
       .modal__body
         .form-group
@@ -19,7 +19,7 @@
           AppInput(placeholder="Your event description" label="Event" textarea="true")
       .modal__footer
         Button(label="Save" type="submit")
-        Button(label="Cancel" @click="open = false")
+        Button(label="Cancel" @click="close")
 </template>
 
 <script lang="ts">
@@ -35,7 +35,7 @@
     components: {SvgIcon, AppInput, Button, AppSelect}
   })
   export default class AppModal extends Vue {
-    private open: boolean = false;
+    private isOpen: boolean = true;
     private eventTypes: SelectOption[] = [
       {
         name: 'Management',
@@ -49,7 +49,23 @@
         name: 'Finance',
         value: 'Finance'
       }
-    ]
+    ];
+
+    close(): void {
+      this.isOpen = false;
+    }
+
+    open(): void {
+      this.isOpen = true;
+    }
+
+    mounted() {
+      this.$root.$on('openmodal', this.open);
+    }
+
+    beforeDestroy() {
+      this.$root.$off('openmodal', this.open);
+    }
   }
 </script>
 

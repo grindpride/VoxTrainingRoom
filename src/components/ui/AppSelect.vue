@@ -40,7 +40,6 @@
     }
 
     mounted() {
-      const selft = this;
       this.$root.$on('window:click', this.closeDropdown);
     }
 
