@@ -43,6 +43,7 @@
     padding: 8px 24px;
     min-height: 32px;
     width: 74px;
+    line-height: normal;
 
     &:disabled {
       opacity: 0.6;
