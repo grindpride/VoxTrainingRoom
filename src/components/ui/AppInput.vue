@@ -32,7 +32,7 @@
     }
 
     focus(): void {
-      this.$refs.inputField.focus();
+      (<HTMLInputElement>this.$refs.inputField).focus();
     }
   }
 </script>
