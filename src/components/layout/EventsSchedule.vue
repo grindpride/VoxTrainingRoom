@@ -9,29 +9,117 @@
             SvgIcon(name="search")
           .layout-icon
             SvgIcon(name="layout")
-      .schedule__content.vox-scroll(@mouseup="openModal")
+      .schedule__content.vox-scroll(
+        ref="scheduleContainer"
+        @mousedown="$emit('mousedown', $event)"
+        @mousemove="$emit('mousemove', $event)"
+        @mouseup="$emit('mouseup')")
         .event(v-for="hour in hours")
           .event__time {{hour}}
           .event__desc
             .event__time-line
             .event__task
+        .event__task.event__task_default(v-for="(event, ind) in events" :style="event.styles")
+        .event__task.event__task_default.new-one(:style="eventBlockStyles")
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
   import SvgIcon from '@/components/ui/SvgIcon.vue';
+  import {EventBlockStyles, ScheduleEvent} from "@/lib/types";
+
 
   @Component({
     components: {SvgIcon}
   })
   export default class EventsSchedule extends Vue {
+    $refs!: {
+      scheduleContainer: Element
+    };
+
     private hours: string[] = [
       "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00",
       "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
     ];
 
-    openModal(e: Event): void {
-      this.$root.$emit('openmodal', e);
+    private events: ScheduleEvent[] = [];
+
+    private eventBlockStyles: EventBlockStyles = {
+      height: '0px',
+      display: 'none',
+      top: '',
+    };
+
+    mounted(): void {
+      const containerTop: number = this.$refs.scheduleContainer.getBoundingClientRect().top + window.scrollY;
+      const paddingHeight: number = parseInt(
+        <string>window.getComputedStyle(this.$refs.scheduleContainer).paddingTop,
+        10
+      );
+
+      let startingPoint: number = 0;
+      let isCreatingEvent: boolean = false;
+
+      this.$on('mousedown', (e: MouseEvent) => {
+        const withinPadding: boolean = e.pageY - containerTop <= paddingHeight;
+
+        if (withinPadding) {
+          return false;
+        }
+
+        if (!isCreatingEvent) {
+          isCreatingEvent = true;
+          this.eventBlockStyles.display = 'block';
+          startingPoint = e.pageY - containerTop;
+
+          this.eventBlockStyles.top = `${startingPoint + this.$refs.scheduleContainer.scrollTop}px`;
+        }
+
+        return true;
+      });
+
+      this.$on('mousemove', (e: MouseEvent) => {
+        const withinPadding: boolean = e.pageY - containerTop <= paddingHeight;
+
+        if (withinPadding) {
+          return false;
+        }
+
+        if (isCreatingEvent) {
+          if (
+            e.pageY - containerTop < startingPoint
+          ) {
+            this.eventBlockStyles.top = `${e.pageY -
+            containerTop +
+            this.$refs.scheduleContainer.scrollTop}px`;
+          }
+
+          const height = Math.abs(startingPoint - e.pageY + containerTop);
+
+          this.eventBlockStyles.height = `${height}px`;
+        }
+      });
+
+      this.$on('mouseup', () => {
+        if (isCreatingEvent) {
+          this.events.push({
+            name: "Some event",
+            desc: 'Some desc',
+            type: "Management",
+            startTime: 'time',
+            endTime: 'endTime',
+            styles: {...this.eventBlockStyles}
+          });
+
+          this.eventBlockStyles.display = 'none';
+          this.eventBlockStyles.height = '0px';
+          this.eventBlockStyles.top = '';
+
+          this.$root.$emit('openmodal');
+        }
+
+        isCreatingEvent = false;
+      });
     }
   }
 </script>

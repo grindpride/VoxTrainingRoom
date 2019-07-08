@@ -35,7 +35,7 @@
     components: {SvgIcon, AppInput, Button, AppSelect}
   })
   export default class AppModal extends Vue {
-    private isOpen: boolean = true;
+    private isOpen: boolean = false;
     private eventTypes: SelectOption[] = [
       {
         name: 'Management',
@@ -59,11 +59,11 @@
       this.isOpen = true;
     }
 
-    mounted() {
+    mounted(): void {
       this.$root.$on('openmodal', this.open);
     }
 
-    beforeDestroy() {
+    beforeDestroy(): void {
       this.$root.$off('openmodal', this.open);
     }
   }

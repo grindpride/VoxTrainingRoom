@@ -15,3 +15,18 @@ export interface SelectOption {
   value: string | number,
   name: string
 }
+
+export interface EventBlockStyles {
+  height: string,
+  display: string,
+  top: string
+}
+
+export interface ScheduleEvent {
+  name: string,
+  desc: string,
+  startTime: string,
+  endTime: string,
+  type: string,
+  styles: EventBlockStyles
+}
