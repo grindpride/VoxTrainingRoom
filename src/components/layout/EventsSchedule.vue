@@ -36,6 +36,11 @@
     $refs!: {
       scheduleContainer: Element
     };
+    private isCreatingEvent: boolean = false;
+    private scheduleContainer: HTMLElement | null = null;
+    private containerTop: number = 0;
+    private paddingHeight: number = 0;
+    private startingPoint: number = 0;
 
     private hours: string[] = [
       "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00",
@@ -50,58 +55,70 @@
       top: '',
     };
 
-    mounted(): void {
-      const containerTop: number = this.$refs.scheduleContainer.getBoundingClientRect().top + window.scrollY;
-      const paddingHeight: number = parseInt(
-        <string>window.getComputedStyle(this.$refs.scheduleContainer).paddingTop,
-        10
-      );
-
-      let startingPoint: number = 0;
-      let isCreatingEvent: boolean = false;
-
-      this.$on('mousedown', (e: MouseEvent) => {
-        const withinPadding: boolean = e.pageY - containerTop <= paddingHeight;
+    private setEventPosition(e:Event){
+      if(this.scheduleContainer){
+        const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
 
         if (withinPadding) {
           return false;
         }
 
-        if (!isCreatingEvent) {
-          isCreatingEvent = true;
-          this.eventBlockStyles.display = 'block';
-          startingPoint = e.pageY - containerTop;
+        if (this.isCreatingEvent) {
+          if (
+            e.pageY - this.containerTop < this.startingPoint
+          ) {
+            this.eventBlockStyles.top = `${e.pageY -
+            this.containerTop +
+            this.scheduleContainer.scrollTop}px`;
+          }
 
-          this.eventBlockStyles.top = `${startingPoint + this.$refs.scheduleContainer.scrollTop}px`;
+          const height = Math.abs(this.startingPoint - e.pageY + this.containerTop);
+
+          this.eventBlockStyles.height = `${height}px`;
+        }
+      }
+
+    }
+
+    beforeDestroy() {
+      (<HTMLElement>this.scheduleContainer).removeEventListener('scroll', this.setEventPosition);
+      this.$off('mousemove', this.setEventPosition);
+    }
+
+    mounted(): void {
+      // this.scheduleContainer
+      this.scheduleContainer = <HTMLElement>this.$refs.scheduleContainer;
+      this.scheduleContainer.addEventListener('scroll', this.setEventPosition);
+      this.containerTop = this.scheduleContainer.getBoundingClientRect().top;
+      this.paddingHeight = parseInt(
+        <string>window.getComputedStyle(this.scheduleContainer).paddingTop,
+        10
+      );
+      this.startingPoint = 0;
+
+
+      this.$on('mousedown', (e: MouseEvent) => {
+        const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
+
+        if (withinPadding) {
+          return false;
+        }
+
+        if (!this.isCreatingEvent) {
+          this.isCreatingEvent = true;
+          this.eventBlockStyles.display = 'block';
+          this.startingPoint = e.pageY - this.containerTop;
+
+          this.eventBlockStyles.top = `${this.startingPoint + this.scheduleContainer.scrollTop}px`;
         }
 
         return true;
       });
 
-      this.$on('mousemove', (e: MouseEvent) => {
-        const withinPadding: boolean = e.pageY - containerTop <= paddingHeight;
-
-        if (withinPadding) {
-          return false;
-        }
-
-        if (isCreatingEvent) {
-          if (
-            e.pageY - containerTop < startingPoint
-          ) {
-            this.eventBlockStyles.top = `${e.pageY -
-            containerTop +
-            this.$refs.scheduleContainer.scrollTop}px`;
-          }
-
-          const height = Math.abs(startingPoint - e.pageY + containerTop);
-
-          this.eventBlockStyles.height = `${height}px`;
-        }
-      });
+      this.$on('mousemove', this.setEventPosition);
 
       this.$on('mouseup', () => {
-        if (isCreatingEvent) {
+        if (this.isCreatingEvent) {
           this.events.push({
             name: "Some event",
             desc: 'Some desc',
@@ -115,10 +132,10 @@
           this.eventBlockStyles.height = '0px';
           this.eventBlockStyles.top = '';
 
-          this.$root.$emit('openmodal');
+          // this.$root.$emit('openmodal');
         }
 
-        isCreatingEvent = false;
+        this.isCreatingEvent = false;
       });
     }
   }
