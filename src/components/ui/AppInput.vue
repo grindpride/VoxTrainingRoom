@@ -1,8 +1,8 @@
 <template lang="pug">
   .input__wrapper(:class="{input_short: short}")
     label.input__label(:for="id") {{label}}
-    div.input(:class="{textarea: textarea}")
-      input-type(:is="inputType" :placeholder="placeholder" :id="id")
+    div.input(:class="{textarea: textarea}" @click="focus")
+      input-type(:is="inputType" :placeholder="placeholder" :id="id" ref="inputField")
 </template>
 
 <script lang="ts">
@@ -29,6 +29,10 @@
 
     private get id(): string {
       return `input-${generateId()}`;
+    }
+
+    focus(): void {
+      this.$refs.inputField.focus();
     }
   }
 </script>
