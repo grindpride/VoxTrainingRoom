@@ -2,7 +2,13 @@
   .input__wrapper(:class="{input_short: short}")
     label.input__label(:for="id") {{label}}
     div.input(:class="{textarea: textarea}" @click="focus")
-      input-type(:is="inputType" :placeholder="placeholder" :id="id" ref="inputField")
+      input-type(
+        :is="inputType"
+        :placeholder="placeholder"
+        :id="id"
+        :value="value"
+        ref="inputField"
+        @input="changeInput")
 </template>
 
 <script lang="ts">
@@ -15,6 +21,7 @@
   export default class AppInput extends Vue {
     @Prop({default: ''}) placeholder: string;
     @Prop() label!: string;
+    @Prop() value!: string;
     @Prop() short: boolean;
     @Prop() textarea: boolean;
 
@@ -31,8 +38,12 @@
       return `input-${generateId()}`;
     }
 
-    focus(): void {
+    private focus(): void {
       (<HTMLInputElement>this.$refs.inputField).focus();
+    }
+
+    private changeInput(e: Event) {
+      this.$emit('input', (<HTMLInputElement>e.target).value);
     }
   }
 </script>
