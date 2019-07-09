@@ -38,9 +38,9 @@ import {MonthTypes} from "../../lib/enums";
     components: {}
   })
   export default class RightSidebar extends Vue {
-    @State activeDate: Date;
+    @State  activeDate: Date;
 
-    @Mutation changeDate: void;
+    @Mutation private changeDate!: (date: Date) => void
 
     private calendarDate: Date = new Date();
     private weekDays: string[] = ['M', 'T', 'W', 'T', 'F', 'Sat', 'Sun'];
