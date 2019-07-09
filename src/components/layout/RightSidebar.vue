@@ -26,6 +26,8 @@ import {MonthTypes} from "../../lib/enums";
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
+  import {State, Mutation} from 'vuex-class'
+
   import {MonthDay} from '@/lib/types';
   import {monthNames} from "@/lib/consts";
   import {getDaysInMonth, getNextMonthDaysToDisplay, getPrevMonthDaysToDisplay, range} from "@/lib/helpers";
@@ -36,19 +38,20 @@ import {MonthTypes} from "../../lib/enums";
     components: {}
   })
   export default class RightSidebar extends Vue {
-    private weekDays: string[] = ['M', 'T', 'W', 'T', 'F', 'Sat', 'Sun'];
-    private date: Date = new Date();
+    @State activeDate: Date;
 
-    private currentMonth: number = this.date.getMonth();
-    private currentDate: number = this.date.getDate();
+    @Mutation changeDate: void;
+
+    private calendarDate: Date = new Date();
+    private weekDays: string[] = ['M', 'T', 'W', 'T', 'F', 'Sat', 'Sun'];
 
     get monthTitle(): string {
-      return `${monthNames[this.date.getMonth()]} ${this.date.getFullYear()}`;
+      return `${monthNames[this.calendarDate.getMonth()]} ${this.calendarDate.getFullYear()}`;
     }
 
     get daysToDisplay(): MonthDay[] {
       const now: Date = new Date();
-      const month = this.date.getMonth();
+      const month = this.calendarDate.getMonth();
 
       now.setMonth(month);
 
@@ -75,20 +78,21 @@ import {MonthTypes} from "../../lib/enums";
         lastMonthWeekday
       );
 
+
       const prevMonthDays: MonthDay[] = range(1, daysInPrevMonth)
         .slice(-prevMonthDaysToDisplay)
         .map(day => ({
           day,
           month: MonthTypes.Prev,
           isCurrentDate:
-            prevMonth === this.currentMonth && day === this.currentDate
+            prevMonth === this.activeDate.getMonth() && day === this.activeDate.getDate()
         }));
 
       const currentMonthDays: MonthDay[] = range(1, daysInCurrentMonth).map(day => ({
         day,
         month: MonthTypes.Current,
         isCurrentDate:
-          this.date.getMonth() === this.currentMonth && day === this.currentDate
+          this.calendarDate.getMonth() === this.activeDate.getMonth() && day === this.activeDate.getDate()
       }));
 
       const nextMonthDays: MonthDay[] = range(1, daysInNextMonth)
@@ -97,14 +101,14 @@ import {MonthTypes} from "../../lib/enums";
           day,
           month: MonthTypes.Next,
           isCurrentDate:
-            nextMonth === this.currentMonth && day === this.currentDate
+            nextMonth === this.activeDate.getMonth() && day === this.activeDate.getDate()
         }));
 
       return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
     }
 
     changeMonth(offset: number): void {
-      this.date = new Date(this.date.setMonth(this.date.getMonth() + offset));
+      this.calendarDate = new Date(this.calendarDate.setMonth(this.calendarDate.getMonth() + offset));
     }
 
     changeCurrentDate(day: number, month: MonthTypes): void {
@@ -114,9 +118,9 @@ import {MonthTypes} from "../../lib/enums";
         this.changeMonth(1);
       }
 
-      this.date = new Date(this.date.setDate(day));
-      this.currentMonth = this.date.getMonth();
-      this.currentDate = this.date.getDate();
+
+      const newDate = new Date(this.calendarDate.setDate(day));
+      this.changeDate(newDate);
     }
   }
 </script>

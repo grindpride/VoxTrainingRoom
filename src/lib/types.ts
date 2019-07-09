@@ -30,3 +30,9 @@ export interface ScheduleEvent {
   type: string,
   styles: EventBlockStyles
 }
+
+export interface State {
+  activeDate: Date,
+  currentEvent: ScheduleEvent | null,
+  events: ScheduleEvent[]
+}
