@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex, {GetterTree, MutationTree} from 'vuex';
 
 import {State} from "@/lib/types";
+import {monthNames} from "@/lib/consts";
 
 Vue.use(Vuex);
 
@@ -12,10 +13,12 @@ const state: State = {
 };
 
 const getters: GetterTree<State, any> = {
-
+  dateTitle: ({activeDate}) => `${activeDate.getDate()} ${
+    monthNames[activeDate.getMonth()]
+    } ${activeDate.getFullYear()}`
 };
 
-const mutations: MutationTree<State>  ={
+const mutations: MutationTree<State> = {
   changeDate(state, newDate) {
     state.activeDate = newDate;
   }

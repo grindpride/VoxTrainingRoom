@@ -2,7 +2,7 @@
   main.schedule
     .schedule__wrapper
       .schedule__header
-        h3.schedule__date 22 March 2018
+        h3.schedule__date {{dateTitle}}
         .schedule__actions
           //input.search
           .search-icon
@@ -25,17 +25,21 @@
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
+  import {Getter} from 'vuex-class'
+
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import {EventBlockStyles, ScheduleEvent} from "@/lib/types";
-
 
   @Component({
     components: {SvgIcon}
   })
   export default class EventsSchedule extends Vue {
+    @Getter dateTitle: string;
+
     $refs!: {
       scheduleContainer: Element
     };
+
     private isCreatingEvent: boolean = false;
     private scheduleContainer: HTMLElement | null = null;
     private containerTop: number = 0;
