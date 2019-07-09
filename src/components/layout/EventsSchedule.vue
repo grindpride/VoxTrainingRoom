@@ -11,9 +11,9 @@
             SvgIcon(name="layout")
       .schedule__content.vox-scroll(
         ref="scheduleContainer"
-        @mousedown="$emit('mousedown', $event)"
-        @mousemove="$emit('mousemove', $event)"
-        @mouseup="$emit('mouseup')")
+        @mousedown="startEventSelection"
+        @mousemove="setEventPosition"
+        @mouseup="stopEventSelection")
         .event(v-for="hour in hours")
           .event__time {{hour}}
           .event__desc
@@ -55,8 +55,8 @@
       top: '',
     };
 
-    private setEventPosition(e:Event){
-      if(this.scheduleContainer){
+    private setEventPosition(e: MouseEvent) {
+      if (this.scheduleContainer) {
         const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
 
         if (withinPadding) {
@@ -80,9 +80,46 @@
 
     }
 
+    private startEventSelection(e: MouseEvent) {
+      const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
+
+      if (withinPadding) {
+        return false;
+      }
+
+      if (!this.isCreatingEvent) {
+        this.isCreatingEvent = true;
+        this.eventBlockStyles.display = 'block';
+        this.startingPoint = e.pageY - this.containerTop;
+
+        this.eventBlockStyles.top = `${this.startingPoint + this.scheduleContainer.scrollTop}px`;
+      }
+
+      return true;
+    }
+
+    private stopEventSelection() {
+      if (this.isCreatingEvent) {
+        this.events.push({
+          name: "Some event",
+          desc: 'Some desc',
+          type: "Management",
+          startTime: 'time',
+          endTime: 'endTime',
+          styles: {...this.eventBlockStyles}
+        });
+
+        this.eventBlockStyles.display = 'none';
+        this.eventBlockStyles.height = '0px';
+        this.eventBlockStyles.top = '';
+
+      }
+
+      this.isCreatingEvent = false;
+    }
+
     beforeDestroy() {
       (<HTMLElement>this.scheduleContainer).removeEventListener('scroll', this.setEventPosition);
-      this.$off('mousemove', this.setEventPosition);
     }
 
     mounted(): void {
@@ -96,47 +133,6 @@
       );
       this.startingPoint = 0;
 
-
-      this.$on('mousedown', (e: MouseEvent) => {
-        const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
-
-        if (withinPadding) {
-          return false;
-        }
-
-        if (!this.isCreatingEvent) {
-          this.isCreatingEvent = true;
-          this.eventBlockStyles.display = 'block';
-          this.startingPoint = e.pageY - this.containerTop;
-
-          this.eventBlockStyles.top = `${this.startingPoint + this.scheduleContainer.scrollTop}px`;
-        }
-
-        return true;
-      });
-
-      this.$on('mousemove', this.setEventPosition);
-
-      this.$on('mouseup', () => {
-        if (this.isCreatingEvent) {
-          this.events.push({
-            name: "Some event",
-            desc: 'Some desc',
-            type: "Management",
-            startTime: 'time',
-            endTime: 'endTime',
-            styles: {...this.eventBlockStyles}
-          });
-
-          this.eventBlockStyles.display = 'none';
-          this.eventBlockStyles.height = '0px';
-          this.eventBlockStyles.top = '';
-
-          // this.$root.$emit('openmodal');
-        }
-
-        this.isCreatingEvent = false;
-      });
     }
   }
 </script>
