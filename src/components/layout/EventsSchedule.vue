@@ -11,7 +11,7 @@
             SvgIcon(name="layout")
       .schedule__content.vox-scroll(
         ref="scheduleContainer"
-        @mousedown="startEventSelection"
+        @mousedown.left="startEventSelection"
         @mousemove="setEventPosition"
         @mouseup="stopEventSelection")
         .event(v-for="hour in hours")
@@ -19,21 +19,29 @@
           .event__desc
             .event__time-line
             .event__task
-        .event__task.event__task_default(v-for="(event, ind) in events" :style="event.styles")
-        .event__task.event__task_default.new-one(:style="eventBlockStyles")
+        .event__task(
+          v-for="(event, ind) in events"
+          :class="{[event.type.toLowerCase()]: true}"
+          :style="event.styles")
+          p {{event.name}}
+          span {{event.desc}}
+        .event__task.default(:style="currentEvent.styles")
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-  import {Getter} from 'vuex-class'
+  import {State, Getter} from 'vuex-class'
 
   import SvgIcon from '@/components/ui/SvgIcon.vue';
-  import {EventBlockStyles, ScheduleEvent} from "@/lib/types";
+  import {ScheduleEvent} from "@/lib/types";
 
   @Component({
     components: {SvgIcon}
   })
   export default class EventsSchedule extends Vue {
+    @State currentEvent: ScheduleEvent;
+    @State events: ScheduleEvent[];
+
     @Getter dateTitle: string;
 
     $refs!: {
@@ -51,14 +59,6 @@
       "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
     ];
 
-    private events: ScheduleEvent[] = [];
-
-    private eventBlockStyles: EventBlockStyles = {
-      height: '0px',
-      display: 'none',
-      top: '',
-    };
-
     private setEventPosition(e: MouseEvent) {
       if (this.scheduleContainer) {
         const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
@@ -71,17 +71,16 @@
           if (
             e.pageY - this.containerTop < this.startingPoint
           ) {
-            this.eventBlockStyles.top = `${e.pageY -
+            this.currentEvent.styles.top = `${e.pageY -
             this.containerTop +
             this.scheduleContainer.scrollTop}px`;
           }
 
           const height = Math.abs(this.startingPoint - e.pageY + this.containerTop);
 
-          this.eventBlockStyles.height = `${height}px`;
+          this.currentEvent.styles.height = `${height}px`;
         }
       }
-
     }
 
     private startEventSelection(e: MouseEvent) {
@@ -93,10 +92,10 @@
 
       if (!this.isCreatingEvent) {
         this.isCreatingEvent = true;
-        this.eventBlockStyles.display = 'block';
+        this.currentEvent.styles.display = 'flex';
         this.startingPoint = e.pageY - this.containerTop;
 
-        this.eventBlockStyles.top = `${this.startingPoint + this.scheduleContainer.scrollTop}px`;
+        this.currentEvent.styles.top = `${this.startingPoint + this.scheduleContainer.scrollTop}px`;
       }
 
       return true;
@@ -104,19 +103,7 @@
 
     private stopEventSelection() {
       if (this.isCreatingEvent) {
-        this.events.push({
-          name: "Some event",
-          desc: 'Some desc',
-          type: "Management",
-          startTime: 'time',
-          endTime: 'endTime',
-          styles: {...this.eventBlockStyles}
-        });
-
-        this.eventBlockStyles.display = 'none';
-        this.eventBlockStyles.height = '0px';
-        this.eventBlockStyles.top = '';
-
+        this.$root.$emit('openmodal');
       }
 
       this.isCreatingEvent = false;
@@ -136,7 +123,6 @@
         10
       );
       this.startingPoint = 0;
-
     }
   }
 </script>
@@ -230,33 +216,33 @@
       height: 100%;
       left: 0;
 
-      &_default,
-      &_design,
-      &_finance,
-      &_management {
+      &.default,
+      &.design,
+      &.finance,
+      &.management {
         position: absolute;
         width: calc(100% - 80px);
         margin-left: 80px;
       }
 
-      &_default {
+      &.default {
         opacity: 0.15;
         background: var(--grey-blue);
         border-left: 4px solid var(--dark-blue-100);
       }
 
-      &_finance {
+      &.finance {
         background: rgba(133, 118, 237, 0.15);
         border-left: 4px solid #8576ed;
       }
 
-      &_design {
+      &.design {
         background: rgba(61, 131, 249, 0.15);
         height: 250%;
         border-left: 4px solid #3d83f9;
       }
 
-      &_management {
+      &.management {
         background: rgba(238, 165, 124, 0.15);
         border-left: 4px solid #eea57c;
         height: 200%;
@@ -271,13 +257,13 @@
       }
 
       p {
-        width: 260px;
+        max-width: 260px;
         font-size: 18px;
       }
 
       span {
         margin-top: 16px;
-        width: 310px;
+        max-width: 310px;
         font-size: 14px;
         opacity: 0.7;
       }

@@ -7,34 +7,59 @@
           SvgIcon(name="cross")
       .modal__body
         .form-group
-          AppInput(placeholder="Type something" label="Event name")
+          AppInput(
+            placeholder="Type something"
+            label="Event name"
+            v-model="scheduleEvent.name")
         .form-group
-          AppInput(placeholder="09:00" label="From" short="true")
+          AppInput(
+            placeholder="09:00"
+            label="From"
+            short="true"
+            v-model="scheduleEvent.startTime")
           .hyphen__wrapper
             .hyphen
-          AppInput(placeholder="23:00" label="To" short="true")
+          AppInput(
+            placeholder="23:00"
+            label="To"
+            short="true"
+            v-model="scheduleEvent.endTime")
         .form-group
-          AppSelect(:options="eventTypes" label="Event type")
+          AppSelect(
+            :options="eventTypes"
+            :value="scheduleEvent.type"
+            label="Event type")
         .form-group
-          AppInput(placeholder="Your event description" label="Event" textarea="true")
+          AppInput(
+            placeholder="Your event description"
+            label="Event"
+            textarea="true"
+            v-model="scheduleEvent.desc")
       .modal__footer
-        Button(label="Save" type="submit")
+        Button(label="Save" type="submit" @click="saveEvent")
         Button(label="Cancel" @click="close")
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
+  import {Mutation, State} from 'vuex-class'
+
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import AppInput from '@/components/ui/AppInput.vue';
   import Button from '@/components/ui/Button.vue';
   import AppSelect from "@/components/ui/AppSelect.vue";
 
-  import {SelectOption} from "@/lib/types";
+  import {ScheduleEvent, SelectOption} from "@/lib/types";
 
   @Component({
     components: {SvgIcon, AppInput, Button, AppSelect}
   })
   export default class AppModal extends Vue {
+    @State currentEvent: ScheduleEvent;
+
+    @Mutation resetEvent!: () => void;
+    @Mutation addEvent!: (event: ScheduleEvent) => void;
+
     private isOpen: boolean = false;
     private eventTypes: SelectOption[] = [
       {
@@ -51,12 +76,24 @@
       }
     ];
 
+    private scheduleEvent = {
+      ...this.currentEvent,
+      type: this.eventTypes[0].value
+    };
+
     close(): void {
       this.isOpen = false;
     }
 
     open(): void {
       this.isOpen = true;
+    }
+
+    saveEvent(): void {
+      this.addEvent({...this.scheduleEvent, styles: this.currentEvent.styles});
+      this.resetEvent();
+
+      this.close();
     }
 
     mounted(): void {
