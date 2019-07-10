@@ -1,4 +1,4 @@
-import {ScheduleEvent} from "@/lib/types";
+import {EventCoords, EventTimeInterval, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
 
 export const getDaysInMonth = (month: number): number => {
   const date: Date = new Date();
@@ -57,3 +57,49 @@ export const createDefaultEvent = (): ScheduleEvent => ({
     top: '',
   }
 });
+
+const getMinutes = (height: number): string => {
+  const minutes = Math.round((((100 * height) / 70) * 60) / 100);
+  return minutes >= 10 ? `${minutes}` : `0${minutes}`;
+};
+
+export const getTimeByCoords =
+  (timeSlotsCoords: TimeSlotsCoords[], {top, bottom}: EventCoords): EventTimeInterval => {
+    const [startTime, endTime] = [top, bottom].map(val => {
+      const timeCoords = timeSlotsCoords.reduce((prev, curr) => {
+        return prev.top <= val && val >= curr.top ? curr : prev;
+      });
+
+      const height: number = val - timeCoords.bottom + timeCoords.height;
+      const minutes: string = getMinutes(height);
+
+      return timeCoords.time.replace(':00', `:${minutes}`);
+    });
+
+    return {startTime, endTime};
+  };
+
+export const getCoordsByTime =
+  (timeSlotsCoords: TimeSlotsCoords[], {startTime, endTime}: EventTimeInterval): EventCoords => {
+    const [top, bottom] = [startTime, endTime].map(time => {
+      const [hour, minutes] = time.split(':');
+
+      const coords = timeSlotsCoords.find(timeSlot => {
+        const [slotHour] = timeSlot.time.split(':');
+
+        return hour === slotHour;
+      }) || {top: 0};
+
+      const minutesHeight = Math.round(
+        (((100 * parseInt(minutes, 10)) / 60) * 70) / 100
+      );
+
+      const coord = coords.top + minutesHeight;
+
+      return coord;
+    });
+
+    return {top, bottom};
+  };
+
+

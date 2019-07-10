@@ -31,12 +31,30 @@ export interface ScheduleEvent {
   styles: EventBlockStyles
 }
 
+export interface TimeSlotsCoords {
+  top: number,
+  height: number,
+  bottom: number,
+  time: string
+}
+
+export interface EventTimeInterval {
+  startTime: string,
+  endTime: string
+}
+
+export interface EventCoords {
+  top: number,
+  bottom: number
+}
+
 export interface DateEventsMap {
   [key: string]: ScheduleEvent[]
 }
 
 export interface State {
   activeDate: Date,
-  currentEvent: ScheduleEvent | null,
-  events: DateEventsMap
+  currentEvent: ScheduleEvent,
+  events: DateEventsMap,
+  timeSlotsCoords: TimeSlotsCoords[] | null,
 }
