@@ -14,7 +14,7 @@
         @mousedown.left="startEventSelection"
         @mousemove="setEventPosition"
         @mouseup="stopEventSelection")
-        .event(v-for="hour in hours")
+        .event(v-for="hour in hours" ref="slots")
           .event__time {{hour}}
           .event__desc
             .event__time-line
@@ -30,19 +30,23 @@
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-  import {State, Getter} from 'vuex-class'
+  import {State, Getter, Mutation} from 'vuex-class'
 
   import SvgIcon from '@/components/ui/SvgIcon.vue';
-  import {ScheduleEvent} from "@/lib/types";
+  import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
 
   @Component({
     components: {SvgIcon}
   })
   export default class EventsSchedule extends Vue {
     @State currentEvent: ScheduleEvent;
+    @State timeSlotsCoords: TimeSlotsCoords | null = null;
 
     @Getter dateTitle: string;
     @Getter currentDateEvents: ScheduleEvent[];
+
+    @Mutation setTimeInterval!: ({top, bottom}: EventCoords) => void;
+    @Mutation setTimeSlotCoords!: (timeSlotCoords: TimeSlotsCoords) => void;
 
     $refs!: {
       scheduleContainer: Element
@@ -58,6 +62,25 @@
       "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00",
       "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
     ];
+
+    private getTimeSlotsCoords() {
+      const coords = this.$refs.slots.map(($el: Element, ind: number) => {
+        let {top}: { top: number } = $el.getBoundingClientRect();
+        const {height}: { height: number } = $el.getBoundingClientRect();
+
+        top -= this.containerTop;
+        top = Math.ceil(top);
+
+        return {
+          top,
+          height,
+          bottom: top + height,
+          time: this.hours[ind]
+        };
+      });
+
+      return coords;
+    }
 
     private setEventPosition(e: MouseEvent) {
       if (this.scheduleContainer) {
@@ -102,8 +125,17 @@
     }
 
     private stopEventSelection() {
-      if (this.isCreatingEvent) {
-        this.$root.$emit('openmodal');
+      const height: number = parseInt(this.currentEvent.styles.height, 10);
+
+      if (height) {
+        const top: number = parseInt(this.currentEvent.styles.top, 10);
+        const bottom: number = top + height;
+
+        this.setTimeInterval({top, bottom});
+
+        if (this.isCreatingEvent) {
+          this.$root.$emit('openmodal');
+        }
       }
 
       this.isCreatingEvent = false;
@@ -122,7 +154,12 @@
         <string>window.getComputedStyle(this.scheduleContainer).paddingTop,
         10
       );
+
+      const timeSlotsCoords = this.getTimeSlotsCoords();
+      this.setTimeSlotCoords(timeSlotsCoords);
+
       this.startingPoint = 0;
+
     }
   }
 </script>

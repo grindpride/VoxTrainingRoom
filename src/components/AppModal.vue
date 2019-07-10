@@ -49,8 +49,7 @@
   import Button from '@/components/ui/Button.vue';
   import AppSelect from "@/components/ui/AppSelect.vue";
 
-  import {ScheduleEvent, SelectOption} from "@/lib/types";
-  import {createDefaultEvent} from "@/lib/helpers";
+  import {EventTimeInterval, ScheduleEvent, SelectOption} from "@/lib/types";
 
   @Component({
     components: {SvgIcon, AppInput, Button, AppSelect}
@@ -60,6 +59,8 @@
 
     @Mutation resetEvent!: () => void;
     @Mutation addEvent!: (event: ScheduleEvent) => void;
+
+    @Mutation setCoords!: ({startTime, endTime}: EventTimeInterval) => void;
 
     private isOpen: boolean = false;
     private eventTypes: SelectOption[] = [
@@ -77,14 +78,12 @@
       }
     ];
 
-    private scheduleEvent: ScheduleEvent = createDefaultEvent();
-
-    reset() {
-      this.resetEvent();
-      this.scheduleEvent = createDefaultEvent();
+    private get scheduleEvent() {
+      return this.currentEvent
     }
 
     close(): void {
+      this.resetEvent();
       this.isOpen = false;
     }
 
@@ -93,8 +92,9 @@
     }
 
     saveEvent(): void {
-      this.addEvent({...this.scheduleEvent, styles: this.currentEvent.styles});
-      this.reset();
+      this.setCoords({startTime: this.scheduleEvent.startTime, endTime: this.scheduleEvent.endTime});
+      this.addEvent(this.scheduleEvent);
+      this.resetEvent();
 
       this.close();
     }
