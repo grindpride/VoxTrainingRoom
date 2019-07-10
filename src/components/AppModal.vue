@@ -1,5 +1,5 @@
 <template lang="pug">
-  .modal__wrapper(v-if="isOpen")
+  .modal__wrapper(v-if="isOpen" @keydown.enter="saveEvent")
     .modal
       .modal__header
         p.modal__title Add event
@@ -27,7 +27,7 @@
         .form-group
           AppSelect(
             :options="eventTypes"
-            :value="scheduleEvent.type"
+            v-model="scheduleEvent.type"
             label="Event type")
         .form-group
           AppInput(
@@ -50,6 +50,7 @@
   import AppSelect from "@/components/ui/AppSelect.vue";
 
   import {ScheduleEvent, SelectOption} from "@/lib/types";
+  import {createDefaultEvent} from "@/lib/helpers";
 
   @Component({
     components: {SvgIcon, AppInput, Button, AppSelect}
@@ -76,13 +77,16 @@
       }
     ];
 
-    private scheduleEvent = {
-      ...this.currentEvent,
-      type: this.eventTypes[0].value
-    };
+    private scheduleEvent: ScheduleEvent = createDefaultEvent();
+
+    reset() {
+      this.resetEvent();
+      this.scheduleEvent = createDefaultEvent();
+    }
 
     close(): void {
       this.isOpen = false;
+
     }
 
     open(): void {
@@ -91,10 +95,11 @@
 
     saveEvent(): void {
       this.addEvent({...this.scheduleEvent, styles: this.currentEvent.styles});
-      this.resetEvent();
+      this.reset();
 
       this.close();
     }
+
 
     mounted(): void {
       this.$root.$on('openmodal', this.open);
