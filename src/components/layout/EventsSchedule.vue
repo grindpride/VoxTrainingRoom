@@ -12,7 +12,7 @@
       .schedule__content.vox-scroll(
         ref="scheduleContainer"
         @mousedown.left="startEventSelection"
-        @mousemove="setEventPosition"
+
         @mouseup="stopEventSelection")
         .event(v-for="hour in hours" ref="slots")
           .event__time {{hour}}
@@ -35,6 +35,7 @@
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
 
+  // @mousemove="setEventPosition"
   @Component({
     components: {SvgIcon}
   })
@@ -58,6 +59,14 @@
     private containerTop: number = 0;
     private paddingHeight: number = 0;
     private startingPoint: number = 0;
+    private currentScrollTop: number = 0;
+    private currentMousePositionY: number = 0;
+    private mouseTrackStartPoint: number = 0;
+    private startScrollTop: number = 0;
+    private lastScrollTop: number = 0;
+    private currentEventHeight: number = 0;
+    private currentEventTop: number = 0;
+    private startDirection: string = 'top';
 
     private hours: string[] = [
       "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00",
@@ -83,31 +92,88 @@
       return coords;
     }
 
+
     private setEventPosition(e: MouseEvent) {
-      if (this.scheduleContainer) {
-        const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
+      const isScrollEvent = e.type === 'scroll';
+      this.currentScrollTop = this.scheduleContainer.scrollTop;
 
-        if (withinPadding) {
-          return false;
-        }
+      if (this.isCreatingEvent) {
+        // const mouseTrackValue = e.pageY - this.mouseTrackStartPoint;
+        // console.log(mouseTrackValue)
 
-        if (this.isCreatingEvent) {
-          if (
-            e.pageY - this.containerTop < this.startingPoint
-          ) {
-            this.currentEvent.styles.top = `${e.pageY -
-            this.containerTop +
-            this.scheduleContainer.scrollTop}px`;
+        // const scrollTopDiff2: number = this.currentScrollTop - this.startScrollTop;
+        const scrollTopDiff: number = this.currentScrollTop - this.lastScrollTop;
+        console.log(scrollTopDiff);
+        const currentScrollDirection = scrollTopDiff > 0 ? 'bottom' : 'top';
+
+
+
+        if (this.scheduleContainer) {
+          const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
+
+          if (withinPadding) {
+            return false;
           }
 
-          const height = Math.abs(this.startingPoint - e.pageY + this.containerTop);
+          if (currentScrollDirection === 'bottom') {
+            console.log('bottom');
+            /* console.log('bottom')
+             if (e.pageY - this.containerTop < this.startingPoint) {
+               console.log('popadaet')
+               this.currentEvent.styles.top = `${e.pageY -
+               this.containerTop +
+               this.scheduleContainer.scrollTop}px`;
+             }*/
+            const scrollTrack = scrollTopDiff;
+            console.log('scrollTrack', scrollTrack);
+            if(this.startDirection === currentScrollDirection){
+              this.currentEventHeight = this.currentEventHeight + scrollTrack;
+            }else{
+              console.log('else')
+              this.currentEventHeight = this.currentEventHeight - scrollTrack;
+              this.currentEventTop = this.currentEventTop - scrollTrack;
+            }
+            this.currentEvent.styles.top = `${this.currentEventTop}px`;
+            this.currentEvent.styles.height = `${this.currentEventHeight}px`;
+          } else {
+            console.log('top');
+            // if (e.pageY - this.containerTop < this.startingPoint) {
+            //   this.currentEvent.styles.top = `
+            //     ${e.pageY -
+            //     this.containerTop +
+            //     this.scheduleContainer.scrollTop}px
+            //   `;
+            // }
 
-          this.currentEvent.styles.height = `${height}px`;
+            const scrollTrack = Math.abs(scrollTopDiff);
+            this.currentEventTop = this.currentEventTop - scrollTrack;
+            this.currentEventHeight = this.currentEventHeight + scrollTrack;
+
+            this.currentEvent.styles.top = `${this.currentEventTop}px`;
+            this.currentEvent.styles.height = `${this.currentEventHeight}px`;
+
+          }
+
+          // this.startDirection = currentScrollDirection;
+
+          console.log('currentEventHeight ', this.currentEventHeight);
+
+          if(this.currentEventHeight < 0){
+            this.startDirection = currentScrollDirection;
+          }
+
+          this.lastScrollTop = this.currentScrollTop;
         }
       }
     }
 
     private startEventSelection(e: MouseEvent) {
+      // console.log(e.clientY, e.pageY)
+      this.mouseTrackStartPoint = e.pageY;
+
+      this.startScrollTop = this.scheduleContainer.scrollTop;
+      this.lastScrollTop = this.scheduleContainer.scrollTop;
+
       const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
 
       if (withinPadding) {
@@ -117,9 +183,10 @@
       if (!this.isCreatingEvent) {
         this.isCreatingEvent = true;
         this.currentEvent.styles.display = 'flex';
-        this.startingPoint = e.pageY - this.containerTop;
+        this.startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
+        this.currentEventTop = this.startingPoint;
 
-        this.currentEvent.styles.top = `${this.startingPoint + this.scheduleContainer.scrollTop}px`;
+        this.currentEvent.styles.top = `${this.startingPoint}px`;
       }
 
       return true;
@@ -135,7 +202,7 @@
         this.setTimeInterval({top, bottom});
 
         if (this.isCreatingEvent) {
-          this.$root.$emit('openmodal');
+          // this.$root.$emit('openmodal');
         }
       }
 
