@@ -1,23 +1,12 @@
 import Vue from 'vue';
 import Vuex, {GetterTree, MutationTree} from 'vuex';
 
-import {ScheduleEvent, State} from "@/lib/types";
+import {State} from "@/lib/types";
 import {monthNames} from "@/lib/consts";
+import {createDefaultEvent} from "@/lib/helpers";
 
 Vue.use(Vuex);
 
-const createDefaultEvent = (): ScheduleEvent => ({
-  name: '',
-  desc: '',
-  startTime: '',
-  endTime: '',
-  type: '',
-  styles: {
-    height: '0px',
-    display: 'none',
-    top: '',
-  }
-});
 
 const state: State = {
   activeDate: new Date(),

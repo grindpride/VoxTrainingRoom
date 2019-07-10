@@ -43,6 +43,7 @@
     }
 
     mounted() {
+      this.$emit("input", this.selectedValue.value);
       this.$root.$on('window:click', this.closeDropdown);
     }
 

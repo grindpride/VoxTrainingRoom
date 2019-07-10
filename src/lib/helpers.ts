@@ -1,3 +1,5 @@
+import {ScheduleEvent} from "@/lib/types";
+
 export const getDaysInMonth = (month: number): number => {
   const date: Date = new Date();
 
@@ -41,3 +43,17 @@ export const idGenerator = (): Function => {
     return generate();
   }
 };
+
+
+export const createDefaultEvent = (): ScheduleEvent => ({
+  name: '',
+  desc: '',
+  startTime: '',
+  endTime: '',
+  type: '',
+  styles: {
+    height: '0px',
+    display: 'none',
+    top: '',
+  }
+});
