@@ -2,7 +2,7 @@
   .select__wrapper
     label.select__label {{label}}
     .select(@click.stop="toggleDropdown")
-      input(disabled="true" :value="value.name")
+      input(disabled="true" :value="selectedValue.name")
       i.icon(:class="{open: dropdownOpen}")
         SvgIcon(name="arrow")
     .select__options(v-show="dropdownOpen")
@@ -22,9 +22,11 @@
   export default class AppSelect extends Vue {
     @Prop() label!: string;
     @Prop() options!: SelectOption[];
+    @Prop() value: string;
+
 
     private dropdownOpen: boolean = false;
-    private value: SelectOption = this.options[0];
+    private selectedValue: SelectOption = this.options[0];
 
     toggleDropdown(): void {
       this.dropdownOpen = !this.dropdownOpen;
@@ -35,7 +37,8 @@
     }
 
     selectValue(option: SelectOption): void {
-      this.value = option;
+      this.selectedValue = option;
+      this.$emit("input", this.selectedValue.value);
       this.closeDropdown();
     }
 
