@@ -46,10 +46,11 @@
     @Getter currentDateEvents: ScheduleEvent[];
 
     @Mutation setTimeInterval!: ({top, bottom}: EventCoords) => void;
-    @Mutation setTimeSlotCoords!: (timeSlotCoords: TimeSlotsCoords) => void;
+    @Mutation setTimeSlotCoords!: (timeSlotCoords: TimeSlotsCoords[]) => void;
 
     $refs!: {
-      scheduleContainer: Element
+      scheduleContainer: Element,
+      slots: Element[]
     };
 
     private isCreatingEvent: boolean = false;
@@ -63,7 +64,7 @@
       "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
     ];
 
-    private getTimeSlotsCoords() {
+    private getTimeSlotsCoords(): TimeSlotsCoords[] {
       const coords = this.$refs.slots.map(($el: Element, ind: number) => {
         let {top}: { top: number } = $el.getBoundingClientRect();
         const {height}: { height: number } = $el.getBoundingClientRect();

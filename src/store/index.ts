@@ -1,7 +1,7 @@
 import Vue from 'vue';
-import Vuex, {GetterTree, } from 'vuex';
+import Vuex, {GetterTree} from 'vuex';
 
-import { State} from "@/lib/types";
+import {State} from "@/lib/types";
 import {monthNames} from "@/lib/consts";
 import {createDefaultEvent} from "@/lib/helpers";
 import {mutations} from "@/store/mutations";
@@ -29,7 +29,16 @@ const getters: GetterTree<State, any> = {
     }
 
     return [];
+  },
+
+  currentDateCategories: state => {
+    const currentEvents = getters.currentDateEvents(state);
+
+    const categories = Array.from(new Set(currentEvents.map(({type}) => type)));
+
+    return categories;
   }
+
 };
 
 export const store = new Vuex.Store({

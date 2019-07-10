@@ -17,16 +17,16 @@ import {MonthTypes} from "../../lib/enums";
           @click="changeCurrentDate(day, month)")
           span {{day}}
     .categories__wrapper
-      p.categories__title Your categories
+      p.categories__title(v-if="currentDateCategories.length") Your categories
       .categories
-        button.category.category_purple Finance
-        button.category.category_orange Management
-        button.category.category_pink Design
+        button.category(
+          v-for="category in currentDateCategories"
+          :class="{[category.toLowerCase()]: true}") {{category}}
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-  import {State, Mutation} from 'vuex-class'
+  import {State, Mutation, Getter} from 'vuex-class'
 
   import {MonthDay} from '@/lib/types';
   import {monthNames} from "@/lib/consts";
@@ -39,6 +39,8 @@ import {MonthTypes} from "../../lib/enums";
   })
   export default class RightSidebar extends Vue {
     @State activeDate: Date;
+
+    @Getter currentDateCategories: string[];
 
     @Mutation private changeDate!: (date: Date) => void;
 
@@ -233,15 +235,15 @@ import {MonthTypes} from "../../lib/enums";
     color: var(--white);
     margin-bottom: 20px;
 
-    &_purple {
+    &.finance {
       background: #8576ed;
     }
 
-    &_orange {
+    &.management {
       background: #f39946;
     }
 
-    &_pink {
+    &.design {
       background: #ff467e;
     }
   }
