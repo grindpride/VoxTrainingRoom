@@ -10,14 +10,24 @@ Vue.use(Vuex);
 
 const state: State = {
   activeDate: new Date(),
-  events: [],
+  events: {},
   currentEvent: createDefaultEvent()
 };
 
 const getters: GetterTree<State, any> = {
   dateTitle: ({activeDate}) => `${activeDate.getDate()} ${
     monthNames[activeDate.getMonth()]
-    } ${activeDate.getFullYear()}`
+    } ${activeDate.getFullYear()}`,
+
+  currentDateEvents: ({activeDate, events}) => {
+    const dateStr = activeDate.toDateString();
+    console.log(activeDate, events);
+    if (events[dateStr] && events[dateStr].length) {
+      return events[dateStr];
+    }
+
+    return [];
+  }
 };
 
 const mutations: MutationTree<State> = {
@@ -26,7 +36,13 @@ const mutations: MutationTree<State> = {
   },
 
   addEvent(state, event) {
-    state.events.push(event);
+    const dateStr: string = state.activeDate.toDateString();
+
+    if (!state.events.hasOwnProperty(dateStr)) {
+      state.events = {...state.events, [dateStr]: []}
+    }
+
+    state.events[dateStr].push(event);
   },
 
   resetEvent(state) {

@@ -20,7 +20,7 @@
             .event__time-line
             .event__task
         .event__task(
-          v-for="(event, ind) in events"
+          v-for="(event, ind) in currentDateEvents"
           :class="{[event.type.toLowerCase()]: true}"
           :style="event.styles")
           p {{event.name}}
@@ -40,9 +40,9 @@
   })
   export default class EventsSchedule extends Vue {
     @State currentEvent: ScheduleEvent;
-    @State events: ScheduleEvent[];
 
     @Getter dateTitle: string;
+    @Getter currentDateEvents: ScheduleEvent[];
 
     $refs!: {
       scheduleContainer: Element

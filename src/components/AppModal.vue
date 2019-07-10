@@ -86,7 +86,6 @@
 
     close(): void {
       this.isOpen = false;
-
     }
 
     open(): void {
@@ -99,7 +98,6 @@
 
       this.close();
     }
-
 
     mounted(): void {
       this.$root.$on('openmodal', this.open);
