@@ -12,7 +12,7 @@
       .schedule__content.vox-scroll(
         ref="scheduleContainer"
         @mousedown.left="startEventSelection"
-
+        @mousemove="handleMouseMove"
         @mouseup="stopEventSelection")
         .event(v-for="hour in hours" ref="slots")
           .event__time {{hour}}
@@ -25,7 +25,7 @@
           :style="event.styles")
           p {{event.name}}
           span {{event.desc}}
-        .event__task.default(:style="currentEvent.styles")
+        .event__task.default(:style="eventStyle")
 </template>
 
 <script lang="ts">
@@ -35,7 +35,34 @@
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
 
-  // @mousemove="setEventPosition"
+  interface EventParams {
+    scrollDiff: number,
+    height: number,
+    top: number
+  }
+
+  const getStylesOffsetWrapper = () => {
+    let prevParams: EventParams | null;
+
+    return (currentParams: EventParams) => {
+      let heightOffset = 0;
+      let topOffset = 0;
+
+      if (!prevParams) {
+        prevParams = {...currentParams}
+      }
+
+      if (currentParams.scrollDiff > 0 && currentParams.height >= prevParams.height) {
+        topOffset = prevParams.top;
+        heightOffset = currentParams.scrollDiff;
+      } else if (currentParams.scrollDiff < 0 && currentParams.height < prevParams.height) {
+        topOffset = prevParams.top;
+        heightOffset = -currentParams.scrollDiff;
+      }
+    }
+  };
+
+  // @mousemove="handleScroll"
   @Component({
     components: {SvgIcon}
   })
@@ -58,20 +85,24 @@
     private scheduleContainer: HTMLElement | null = null;
     private containerTop: number = 0;
     private paddingHeight: number = 0;
-    private startingPoint: number = 0;
     private currentScrollTop: number = 0;
-    private currentMousePositionY: number = 0;
-    private mouseTrackStartPoint: number = 0;
-    private startScrollTop: number = 0;
-    private lastScrollTop: number = 0;
-    private currentEventHeight: number = 0;
+    private lastMousePoint: number = 0;
     private currentEventTop: number = 0;
-    private startDirection: string = 'top';
+
+    private startingPoint: number = 0;
+    private lastScrollTop: number = 0;
+    private vectorHeight: number = 0;
 
     private hours: string[] = [
       "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00",
       "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
     ];
+
+    private get eventStyle(): { top: string, height: string } {
+      return this.vectorHeight > 0
+        ? {top: `${this.startingPoint}px`, height: `${this.vectorHeight}px`}
+        : {top: `${this.startingPoint-Math.abs(this.vectorHeight)}px`, height: `${Math.abs(this.vectorHeight)}px`}
+    }
 
     private getTimeSlotsCoords(): TimeSlotsCoords[] {
       const coords = this.$refs.slots.map(($el: Element, ind: number) => {
@@ -93,86 +124,31 @@
     }
 
 
-    private setEventPosition(e: MouseEvent) {
-      const isScrollEvent = e.type === 'scroll';
+    private handleScroll() {
       this.currentScrollTop = this.scheduleContainer.scrollTop;
-
+      const scrollDiff = this.currentScrollTop - this.lastScrollTop;
       if (this.isCreatingEvent) {
-        // const mouseTrackValue = e.pageY - this.mouseTrackStartPoint;
-        // console.log(mouseTrackValue)
-
-        // const scrollTopDiff2: number = this.currentScrollTop - this.startScrollTop;
-        const scrollTopDiff: number = this.currentScrollTop - this.lastScrollTop;
-        console.log(scrollTopDiff);
-        const currentScrollDirection = scrollTopDiff > 0 ? 'bottom' : 'top';
-
-
-
-        if (this.scheduleContainer) {
-          const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
-
-          if (withinPadding) {
-            return false;
-          }
-
-          if (currentScrollDirection === 'bottom') {
-            console.log('bottom');
-            /* console.log('bottom')
-             if (e.pageY - this.containerTop < this.startingPoint) {
-               console.log('popadaet')
-               this.currentEvent.styles.top = `${e.pageY -
-               this.containerTop +
-               this.scheduleContainer.scrollTop}px`;
-             }*/
-            const scrollTrack = scrollTopDiff;
-            console.log('scrollTrack', scrollTrack);
-            if(this.startDirection === currentScrollDirection){
-              this.currentEventHeight = this.currentEventHeight + scrollTrack;
-            }else{
-              console.log('else')
-              this.currentEventHeight = this.currentEventHeight - scrollTrack;
-              this.currentEventTop = this.currentEventTop - scrollTrack;
-            }
-            this.currentEvent.styles.top = `${this.currentEventTop}px`;
-            this.currentEvent.styles.height = `${this.currentEventHeight}px`;
-          } else {
-            console.log('top');
-            // if (e.pageY - this.containerTop < this.startingPoint) {
-            //   this.currentEvent.styles.top = `
-            //     ${e.pageY -
-            //     this.containerTop +
-            //     this.scheduleContainer.scrollTop}px
-            //   `;
-            // }
-
-            const scrollTrack = Math.abs(scrollTopDiff);
-            this.currentEventTop = this.currentEventTop - scrollTrack;
-            this.currentEventHeight = this.currentEventHeight + scrollTrack;
-
-            this.currentEvent.styles.top = `${this.currentEventTop}px`;
-            this.currentEvent.styles.height = `${this.currentEventHeight}px`;
-
-          }
-
-          // this.startDirection = currentScrollDirection;
-
-          console.log('currentEventHeight ', this.currentEventHeight);
-
-          if(this.currentEventHeight < 0){
-            this.startDirection = currentScrollDirection;
-          }
-
-          this.lastScrollTop = this.currentScrollTop;
-        }
+        this.vectorHeight = this.vectorHeight + scrollDiff;
+        this.lastScrollTop = this.currentScrollTop;
       }
     }
 
-    private startEventSelection(e: MouseEvent) {
-      // console.log(e.clientY, e.pageY)
-      this.mouseTrackStartPoint = e.pageY;
+    private handleMouseMove(e: MouseEvent) {
+        if(this.isCreatingEvent){
+          const currentMousePoint = e.pageY;
+          const mouseDiff = currentMousePoint - this.lastMousePoint;
+          console.log(mouseDiff)
+          this.vectorHeight = this.vectorHeight + mouseDiff;
+          this.lastMousePoint = currentMousePoint;
+        }
 
-      this.startScrollTop = this.scheduleContainer.scrollTop;
+    }
+
+    private startEventSelection(e: MouseEvent) {
+      this.lastMousePoint = e.pageY;
+      this.startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
       this.lastScrollTop = this.scheduleContainer.scrollTop;
+
 
       const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
 
@@ -210,13 +186,13 @@
     }
 
     beforeDestroy() {
-      (<HTMLElement>this.scheduleContainer).removeEventListener('scroll', this.setEventPosition);
+      (<HTMLElement>this.scheduleContainer).removeEventListener('scroll', this.handleScroll);
     }
 
     mounted(): void {
       // this.scheduleContainer
       this.scheduleContainer = <HTMLElement>this.$refs.scheduleContainer;
-      this.scheduleContainer.addEventListener('scroll', this.setEventPosition);
+      this.scheduleContainer.addEventListener('scroll', this.handleScroll);
       this.containerTop = this.scheduleContainer.getBoundingClientRect().top;
       this.paddingHeight = parseInt(
         <string>window.getComputedStyle(this.scheduleContainer).paddingTop,
