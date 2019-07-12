@@ -1,7 +1,9 @@
 <template lang="pug">
   .input__wrapper(:class="{input_short: short}")
     label.input__label(:for="id") {{label}}
-    div.input(:class="{textarea: type === 'textarea'}" @click="focus")
+    div.input(
+      :class="{textarea: type === 'textarea', 'input--error': error}"
+      @click="focus")
       input(
         v-if="type === 'input' && !mask"
         :placeholder="placeholder"
@@ -101,6 +103,10 @@
       width: 67px;
     }
 
+    &--error {
+      border-color: red;
+    }
+
     &__tooltip {
       font-weight: 500;
       position: absolute;
@@ -118,12 +124,11 @@
       padding: 12px;
 
 
-
       &::before {
         content: "";
         width: 10px;
         height: 10px;
-        top: calc(50%- 5px);
+        top: calc(50% - 5px);
         position: absolute;
         left: -7px;
         transform: rotate(-45deg);

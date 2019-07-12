@@ -145,7 +145,6 @@
         const newStyles = this.changeEventStyles();
         this.setEventStyles(newStyles);
       }
-
     }
 
     private startEventSelection(e: MouseEvent) {
@@ -182,6 +181,8 @@
         this.setTimeInterval({top, bottom});
 
         if (this.isCreatingEvent) {
+          this.vectorHeight = 0;
+          this.startingPoint = 0;
           this.$root.$emit('openmodal');
         }
       }

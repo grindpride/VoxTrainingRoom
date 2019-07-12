@@ -24,6 +24,7 @@
             placeholder="23:00"
             label="To"
             short="true"
+            mask="##:##"
             v-model="scheduleEvent.endTime")
         .form-group
           AppSelect(
@@ -63,7 +64,7 @@
 
     @Mutation setCoords!: ({startTime, endTime}: EventTimeInterval) => void;
 
-    private isOpen: boolean = true;
+    private isOpen: boolean = false;
     private eventTypes: SelectOption[] = [
       {
         name: 'Management',
