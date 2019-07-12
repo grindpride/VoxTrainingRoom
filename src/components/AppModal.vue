@@ -16,6 +16,7 @@
             placeholder="09:00"
             label="From"
             short="true"
+            mask="##:##"
             v-model="scheduleEvent.startTime")
           .hyphen__wrapper
             .hyphen
@@ -33,7 +34,7 @@
           AppInput(
             placeholder="Your event description"
             label="Event"
-            textarea="true"
+            type="textarea"
             v-model="scheduleEvent.desc")
       .modal__footer
         Button(label="Save" type="submit" @click="saveEvent")
@@ -62,7 +63,7 @@
 
     @Mutation setCoords!: ({startTime, endTime}: EventTimeInterval) => void;
 
-    private isOpen: boolean = false;
+    private isOpen: boolean = true;
     private eventTypes: SelectOption[] = [
       {
         name: 'Management',

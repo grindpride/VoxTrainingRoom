@@ -1,38 +1,55 @@
 <template lang="pug">
   .input__wrapper(:class="{input_short: short}")
     label.input__label(:for="id") {{label}}
-    div.input(:class="{textarea: textarea}" @click="focus")
-      input-type(
-        :is="inputType"
+    div.input(:class="{textarea: type === 'textarea'}" @click="focus")
+      input(
+        v-if="type === 'input' && !mask"
         :placeholder="placeholder"
         :id="id"
         :value="value"
         ref="inputField"
         @input="changeInput")
+      input(
+        v-else-if="type === 'input' && mask"
+        :placeholder="placeholder"
+        :id="id"
+        :value="value"
+        ref="inputField"
+        v-mask="mask"
+        @input="changeInput")
+      textarea(
+        v-else
+        :placeholder="placeholder"
+        :id="id"
+        :value="value"
+        ref="inputField"
+        @input="changeInput")
+      div.input__tooltip(v-if="error")
+        | {{error}}
 </template>
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator';
+  import {mask} from 'vue-the-mask';
+
   import {idGenerator} from "@/lib/helpers";
+  import {InputType} from "@/lib/enums";
 
   const generateId: Function = idGenerator();
 
-  @Component
+  @Component({
+    directives: {mask}
+  })
   export default class AppInput extends Vue {
     @Prop({default: ''}) placeholder: string;
+    @Prop({default: InputType.input}) type!: InputType;
+
+    @Prop() mask: string;
     @Prop() label!: string;
     @Prop() value!: string;
     @Prop() short: boolean;
-    @Prop() textarea: boolean;
+    @Prop() error: string;
 
-
-    private get inputType(): string {
-      if (this.textarea) {
-        return 'textarea';
-      }
-
-      return 'input';
-    }
 
     private get id(): string {
       return `input-${generateId()}`;
@@ -82,6 +99,38 @@
 
     &_short {
       width: 67px;
+    }
+
+    &__tooltip {
+      font-weight: 500;
+      position: absolute;
+      left: calc(100% + 12px);
+      box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+      width: 200px;
+      background: var(--white);
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: pre-wrap;
+      border: 1px solid var(--gray-400);
+      border-radius: 4px;
+      padding: 12px;
+
+
+
+      &::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        top: calc(50%- 5px);
+        position: absolute;
+        left: -7px;
+        transform: rotate(-45deg);
+        border-top: 1px solid var(--gray-400);
+        border-left: 1px solid var(--gray-400);
+        background: var(--white);
+      }
     }
   }
 

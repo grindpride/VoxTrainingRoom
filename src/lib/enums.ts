@@ -8,3 +8,8 @@ export enum ButtonTypes {
   Submit = 'submit',
   Default = 'default'
 }
+
+export enum InputType {
+  input = 'input',
+  textarea = 'textarea'
+}
