@@ -25,7 +25,7 @@
           :style="event.styles")
           p {{event.name}}
           span {{event.desc}}
-        .event__task.default(:style="eventStyle")
+        .event__task.default(:style="currentEvent.styles")
 </template>
 
 <script lang="ts">
@@ -41,28 +41,6 @@
     top: number
   }
 
-  const getStylesOffsetWrapper = () => {
-    let prevParams: EventParams | null;
-
-    return (currentParams: EventParams) => {
-      let heightOffset = 0;
-      let topOffset = 0;
-
-      if (!prevParams) {
-        prevParams = {...currentParams}
-      }
-
-      if (currentParams.scrollDiff > 0 && currentParams.height >= prevParams.height) {
-        topOffset = prevParams.top;
-        heightOffset = currentParams.scrollDiff;
-      } else if (currentParams.scrollDiff < 0 && currentParams.height < prevParams.height) {
-        topOffset = prevParams.top;
-        heightOffset = -currentParams.scrollDiff;
-      }
-    }
-  };
-
-  // @mousemove="handleScroll"
   @Component({
     components: {SvgIcon}
   })
@@ -73,8 +51,10 @@
     @Getter dateTitle: string;
     @Getter currentDateEvents: ScheduleEvent[];
 
+
     @Mutation setTimeInterval!: ({top, bottom}: EventCoords) => void;
     @Mutation setTimeSlotCoords!: (timeSlotCoords: TimeSlotsCoords[]) => void;
+    @Mutation setEventStyles!: ({top, height}: { top: string, height: string }) => void;
 
     $refs!: {
       scheduleContainer: Element,
@@ -98,10 +78,24 @@
       "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
     ];
 
-    private get eventStyle(): { top: string, height: string } {
-      return this.vectorHeight > 0
-        ? {top: `${this.startingPoint}px`, height: `${this.vectorHeight}px`}
-        : {top: `${this.startingPoint-Math.abs(this.vectorHeight)}px`, height: `${Math.abs(this.vectorHeight)}px`}
+    beforeDestroy() {
+      (<HTMLElement>this.scheduleContainer).removeEventListener('scroll', this.handleScroll);
+    }
+
+    mounted(): void {
+      // this.scheduleContainer
+      this.scheduleContainer = <HTMLElement>this.$refs.scheduleContainer;
+      this.scheduleContainer.addEventListener('scroll', this.handleScroll);
+      this.containerTop = this.scheduleContainer.getBoundingClientRect().top;
+      this.paddingHeight = parseInt(
+        <string>window.getComputedStyle(this.scheduleContainer).paddingTop,
+        10
+      );
+
+      const timeSlotsCoords = this.getTimeSlotsCoords();
+      this.setTimeSlotCoords(timeSlotsCoords);
+
+      this.startingPoint = 0;
     }
 
     private getTimeSlotsCoords(): TimeSlotsCoords[] {
@@ -123,31 +117,41 @@
       return coords;
     }
 
+    private changeEventStyles(): { top: string, height: string } {
+      return this.vectorHeight > 0
+        ? {top: `${this.startingPoint}px`, height: `${this.vectorHeight}px`}
+        : {top: `${this.startingPoint - Math.abs(this.vectorHeight)}px`, height: `${Math.abs(this.vectorHeight)}px`}
+    }
 
     private handleScroll() {
-      this.currentScrollTop = this.scheduleContainer.scrollTop;
+      this.currentScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
       const scrollDiff = this.currentScrollTop - this.lastScrollTop;
       if (this.isCreatingEvent) {
         this.vectorHeight = this.vectorHeight + scrollDiff;
         this.lastScrollTop = this.currentScrollTop;
+
+        const newStyles = this.changeEventStyles();
+        this.setEventStyles(newStyles);
       }
     }
 
     private handleMouseMove(e: MouseEvent) {
-        if(this.isCreatingEvent){
-          const currentMousePoint = e.pageY;
-          const mouseDiff = currentMousePoint - this.lastMousePoint;
-          console.log(mouseDiff)
-          this.vectorHeight = this.vectorHeight + mouseDiff;
-          this.lastMousePoint = currentMousePoint;
-        }
+      if (this.isCreatingEvent) {
+        const currentMousePoint = e.pageY;
+        const mouseDiff = currentMousePoint - this.lastMousePoint;
+        this.vectorHeight = this.vectorHeight + mouseDiff;
+        this.lastMousePoint = currentMousePoint;
+
+        const newStyles = this.changeEventStyles();
+        this.setEventStyles(newStyles);
+      }
 
     }
 
     private startEventSelection(e: MouseEvent) {
       this.lastMousePoint = e.pageY;
       this.startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
-      this.lastScrollTop = this.scheduleContainer.scrollTop;
+      this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
 
 
       const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
@@ -178,33 +182,13 @@
         this.setTimeInterval({top, bottom});
 
         if (this.isCreatingEvent) {
-          // this.$root.$emit('openmodal');
+          this.$root.$emit('openmodal');
         }
       }
 
       this.isCreatingEvent = false;
     }
 
-    beforeDestroy() {
-      (<HTMLElement>this.scheduleContainer).removeEventListener('scroll', this.handleScroll);
-    }
-
-    mounted(): void {
-      // this.scheduleContainer
-      this.scheduleContainer = <HTMLElement>this.$refs.scheduleContainer;
-      this.scheduleContainer.addEventListener('scroll', this.handleScroll);
-      this.containerTop = this.scheduleContainer.getBoundingClientRect().top;
-      this.paddingHeight = parseInt(
-        <string>window.getComputedStyle(this.scheduleContainer).paddingTop,
-        10
-      );
-
-      const timeSlotsCoords = this.getTimeSlotsCoords();
-      this.setTimeSlotCoords(timeSlotsCoords);
-
-      this.startingPoint = 0;
-
-    }
   }
 </script>
 

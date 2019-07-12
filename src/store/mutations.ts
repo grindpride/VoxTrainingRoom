@@ -25,19 +25,29 @@ export const mutations: MutationTree<State> = {
     state.timeSlotsCoords = timeSlotCoords;
   },
 
+  setEventStyles(state, {top, height}) {
+    state.currentEvent.styles.top = top;
+    state.currentEvent.styles.height = height;
+  },
+
   setCoords(state, {startTime, endTime}) {
     state.currentEvent.startTime = startTime;
     state.currentEvent.endTime = endTime;
 
-    const {top, bottom}: EventCoords = getCoordsByTime(<TimeSlotsCoords[]>(state.timeSlotsCoords), {startTime, endTime});
+    const {top, bottom}: EventCoords = getCoordsByTime(<TimeSlotsCoords[]>(state.timeSlotsCoords), {
+      startTime,
+      endTime
+    });
 
     state.currentEvent.styles.top = `${top}px`;
     state.currentEvent.styles.height = `${bottom - top}px`;
   },
 
-  setTimeInterval(state, { top, bottom}) {
-
-    const {startTime, endTime}: EventTimeInterval = getTimeByCoords(<TimeSlotsCoords[]>state.timeSlotsCoords, {top, bottom});
+  setTimeInterval(state, {top, bottom}) {
+    const {startTime, endTime}: EventTimeInterval = getTimeByCoords(<TimeSlotsCoords[]>state.timeSlotsCoords, {
+      top,
+      bottom
+    });
 
     state.currentEvent.startTime = startTime;
     state.currentEvent.endTime = endTime;
