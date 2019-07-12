@@ -35,12 +35,6 @@
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
 
-  interface EventParams {
-    scrollDiff: number,
-    height: number,
-    top: number
-  }
-
   @Component({
     components: {SvgIcon}
   })
@@ -183,6 +177,7 @@
         if (this.isCreatingEvent) {
           this.vectorHeight = 0;
           this.startingPoint = 0;
+
           this.$root.$emit('openmodal');
         }
       }
