@@ -46,6 +46,7 @@
     line-height: normal;
 
     &:disabled {
+      cursor: default;
       opacity: 0.6;
     }
 

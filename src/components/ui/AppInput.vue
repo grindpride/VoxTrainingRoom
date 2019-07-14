@@ -2,14 +2,17 @@
   .input__wrapper(:class="{input_short: short}")
     label.input__label(:for="id") {{label}}
     div.input(
-      :class="{textarea: type === 'textarea', 'input--error': error}"
+      :class="{textarea: type === 'textarea', 'input--error': showError}"
       @click="focus")
       input(
         v-if="type === 'input' && !mask"
         :placeholder="placeholder"
         :id="id"
         :value="value"
+        :name="name"
         ref="inputField"
+        @blur="checkError"
+        @focus="resetError"
         @input="changeInput")
       input(
         v-else-if="type === 'input' && mask"
@@ -17,25 +20,32 @@
         :id="id"
         :value="value"
         ref="inputField"
+        :name="name"
         v-mask="mask"
+        @blur="checkError"
+        @focus="resetError"
         @input="changeInput")
       textarea(
         v-else
         :placeholder="placeholder"
         :id="id"
         :value="value"
+        :name="name"
         ref="inputField"
+        @blur="setError"
+        @focus="resetError"
         @input="changeInput")
-      div.input__tooltip(v-if="error")
-        | {{error}}
+      div.input__tooltip(v-if="showError")
+        | {{ error }}
 </template>
 
 <script lang="ts">
-  import {Component, Prop, Vue} from 'vue-property-decorator';
+  import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
   import {mask} from 'vue-the-mask';
 
   import {idGenerator} from "@/lib/helpers";
   import {InputType} from "@/lib/enums";
+  import {InputValidator} from "@/lib/types";
 
   const generateId: Function = idGenerator();
 
@@ -49,12 +59,25 @@
     @Prop() mask: string;
     @Prop() label!: string;
     @Prop() value!: string;
+    @Prop() name!: string;
     @Prop() short: boolean;
-    @Prop() error: string;
+    @Prop() parentError: string;
+    @Prop() validators: InputValidator[];
 
+    private error = "";
+    private showError = false;
+
+    @Watch('parentError')
+    onParentErrorChanged(oldVal: string, val: string) {
+      this.setError(oldVal || val);
+    }
 
     private get id(): string {
       return `input-${generateId()}`;
+    }
+
+    mounted() {
+      this.setError();
     }
 
     private focus(): void {
@@ -62,8 +85,38 @@
     }
 
     private changeInput(e: Event) {
-      this.$emit('input', (<HTMLInputElement>e.target).value);
+      const {value} = (<HTMLInputElement>e.target);
+      this.$emit('input', value);
+
+      this.setError(value);
     }
+
+    private setError(value?: string): void {
+      if (this.validators) {
+        const hasError: InputValidator | undefined = this.validators.find(({isValid}) => !isValid(this.value || value));
+
+        this.error = (hasError && hasError.error) || ''
+      }
+
+      if (!this.error) {
+        this.error = this.parentError || "";
+      }
+
+      this.$emit('error', {[this.name]: this.error});
+    }
+
+    private resetError(): void {
+      this.showError = false;
+    }
+
+    private checkError(): void {
+      this.setError();
+
+      if (this.error) {
+        this.showError = true;
+      }
+    }
+
   }
 </script>
 
@@ -122,6 +175,7 @@
       border: 1px solid var(--gray-400);
       border-radius: 4px;
       padding: 12px;
+      z-index: 2;
 
 
       &::before {

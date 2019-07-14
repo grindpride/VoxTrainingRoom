@@ -103,3 +103,14 @@ export const getCoordsByTime =
   };
 
 
+export const checkIfEndTimeBigger = (startTime: string, endTime: string): boolean => {
+  const [start, end] = [startTime, endTime].map(time => {
+    const [hours, minutes] = time.split(':');
+
+    return parseInt(hours, 10) + parseInt(minutes, 10) / 60;
+  });
+
+  return end > start;
+};
+
+

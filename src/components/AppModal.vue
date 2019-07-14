@@ -10,6 +10,9 @@
           AppInput(
             placeholder="Type something"
             label="Event name"
+            name="eventName"
+            :validators="eventNameValidators"
+            @error="setError"
             v-model="scheduleEvent.name")
         .form-group
           AppInput(
@@ -17,6 +20,10 @@
             label="From"
             short="true"
             mask="##:##"
+            name="startTime"
+            @error="setError"
+            :validators="timeValidators"
+            :parentError="timeError"
             v-model="scheduleEvent.startTime")
           .hyphen__wrapper
             .hyphen
@@ -24,7 +31,10 @@
             placeholder="23:00"
             label="To"
             short="true"
+            @error="setError"
+            name="endTime"
             mask="##:##"
+            :validators="timeValidators"
             v-model="scheduleEvent.endTime")
         .form-group
           AppSelect(
@@ -36,9 +46,10 @@
             placeholder="Your event description"
             label="Event"
             type="textarea"
+            name="eventDesc"
             v-model="scheduleEvent.desc")
       .modal__footer
-        Button(label="Save" type="submit" @click="saveEvent")
+        Button(label="Save" type="submit" @click="saveEvent" :disabled="hasError")
         Button(label="Cancel" @click="close")
 </template>
 
@@ -52,6 +63,8 @@
   import AppSelect from "@/components/ui/AppSelect.vue";
 
   import {EventTimeInterval, ScheduleEvent, SelectOption} from "@/lib/types";
+  import {eventNameValidators, timeValidators} from "@/lib/validators";
+  import {checkIfEndTimeBigger} from "@/lib/helpers";
 
   @Component({
     components: {SvgIcon, AppInput, Button, AppSelect}
@@ -63,6 +76,14 @@
     @Mutation addEvent!: (event: ScheduleEvent) => void;
 
     @Mutation setCoords!: ({startTime, endTime}: EventTimeInterval) => void;
+
+    private errors: { [key: string]: string } = {};
+
+    private get hasError(): boolean {
+      const error = Object.keys(this.errors).some(k => this.errors[k]) || !!this.timeError;
+
+      return error;
+    }
 
     private isOpen: boolean = false;
     private eventTypes: SelectOption[] = [
@@ -80,8 +101,27 @@
       }
     ];
 
+    private eventNameValidators = eventNameValidators;
+    private timeValidators = timeValidators;
+
     private get scheduleEvent() {
       return this.currentEvent
+    }
+
+    private get timeError(): string {
+      if (!checkIfEndTimeBigger(this.currentEvent.startTime, this.currentEvent.endTime)) {
+        return "Start time can't be bigger then end time"
+      }
+
+      return "";
+    }
+
+    mounted(): void {
+      this.$root.$on('openmodal', this.open);
+    }
+
+    beforeDestroy(): void {
+      this.$root.$off('openmodal', this.open);
     }
 
     close(): void {
@@ -101,12 +141,16 @@
       this.close();
     }
 
-    mounted(): void {
-      this.$root.$on('openmodal', this.open);
-    }
+    setError(error: { [key: string]: string }): void {
+      if (error) {
+        const key = Object.keys(error)[0];
 
-    beforeDestroy(): void {
-      this.$root.$off('openmodal', this.open);
+        if (!this.errors.hasOwnProperty(key)) {
+          this.errors = {...this.errors, [key]: ""}
+        }
+
+        this.errors[key] = error[key];
+      }
     }
   }
 </script>

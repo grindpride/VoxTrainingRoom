@@ -52,6 +52,11 @@ export interface DateEventsMap {
   [key: string]: ScheduleEvent[]
 }
 
+export interface InputValidator {
+  isValid: (...args: any[]) => boolean,
+  error: string
+}
+
 export interface State {
   activeDate: Date,
   currentEvent: ScheduleEvent,
