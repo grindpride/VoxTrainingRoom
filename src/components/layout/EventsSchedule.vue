@@ -22,15 +22,16 @@
         .event__task(
           v-for="(event, ind) in currentDateEvents"
           :class="{[event.type.toLowerCase()]: true}"
+          @click="editEvent(event)"
           :style="event.styles")
           p {{event.name}}
-          span {{event.desc}}
+          span(v-if="event.desc") {{event.desc}}
         .event__task.default(:style="currentEvent.styles")
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-  import {State, Getter, Mutation} from 'vuex-class'
+  import {Getter, Mutation, State} from 'vuex-class'
 
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
@@ -49,6 +50,7 @@
     @Mutation setTimeInterval!: ({top, bottom}: EventCoords) => void;
     @Mutation setTimeSlotCoords!: (timeSlotCoords: TimeSlotsCoords[]) => void;
     @Mutation setEventStyles!: ({top, height}: { top: string, height: string }) => void;
+    @Mutation setCurrentEvent!: (event: ScheduleEvent) => void;
 
     $refs!: {
       scheduleContainer: Element,
@@ -183,6 +185,12 @@
       }
 
       this.isCreatingEvent = false;
+    }
+
+    private editEvent(event: ScheduleEvent) {
+      console.log(event);
+      this.setCurrentEvent(event);
+      this.$root.$emit('openmodal');
     }
 
   }

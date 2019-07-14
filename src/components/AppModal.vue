@@ -2,7 +2,7 @@
   .modal__wrapper(v-if="isOpen" @keydown.enter="saveEvent")
     .modal
       .modal__header
-        p.modal__title Add event
+        p.modal__title {{hasCurrentEventExist ? 'Edit event' : 'Add event'}}
         i.close-icon(@click="close")
           SvgIcon(name="cross")
       .modal__body
@@ -49,13 +49,13 @@
             name="eventDesc"
             v-model="scheduleEvent.desc")
       .modal__footer
-        Button(label="Save" type="submit" @click="saveEvent" :disabled="hasError")
+        Button(:label="hasCurrentEventExist ? 'Edit' : 'Save'" type="submit" @click="saveEvent" :disabled="hasError")
         Button(label="Cancel" @click="close")
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-  import {Mutation, State} from 'vuex-class'
+  import {Getter, Mutation, State} from 'vuex-class'
 
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import AppInput from '@/components/ui/AppInput.vue';
@@ -71,6 +71,7 @@
   })
   export default class AppModal extends Vue {
     @State currentEvent: ScheduleEvent;
+    @Getter hasCurrentEventExist: boolean;
 
     @Mutation resetEvent!: () => void;
     @Mutation addEvent!: (event: ScheduleEvent) => void;
