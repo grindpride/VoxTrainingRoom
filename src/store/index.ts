@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex, {GetterTree} from 'vuex';
 
-import {State} from "@/lib/types";
+import {ScheduleEvent, State} from "@/lib/types";
 import {monthNames} from "@/lib/consts";
 import {createDefaultEvent} from "@/lib/helpers";
 import {mutations} from "@/store/mutations";
@@ -37,6 +37,20 @@ const getters: GetterTree<State, any> = {
     const categories = Array.from(new Set(currentEvents.map(({type}) => type)));
 
     return categories;
+  },
+
+  hasCurrentEventExist: (state) :boolean => {
+    const currentEvents = getters.currentDateEvents(state);
+
+    if (state.currentEvent && currentEvents.length) {
+      return currentEvents.some((event: ScheduleEvent) => {
+        return Object.keys(state.currentEvent)
+          .filter(k => k !== 'styles')
+          .every((k: string) => state.currentEvent[k] === event[k])
+      })
+    }
+
+    return false;
   }
 
 };
