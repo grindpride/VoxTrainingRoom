@@ -133,14 +133,6 @@
       this.isOpen = true;
     }
 
-    saveEvent(): void {
-      this.setCoords({startTime: this.scheduleEvent.startTime, endTime: this.scheduleEvent.endTime});
-      this.addEvent(this.scheduleEvent);
-      this.resetEvent();
-
-      this.close();
-    }
-
     setError(error: { [key: string]: string }): void {
       if (error) {
         const key = Object.keys(error)[0];
@@ -150,6 +142,16 @@
         }
 
         this.errors[key] = error[key];
+      }
+    }
+
+    saveEvent(): void {
+      if (!this.hasError) {
+        this.setCoords({startTime: this.scheduleEvent.startTime, endTime: this.scheduleEvent.endTime});
+        this.addEvent(this.scheduleEvent);
+        this.resetEvent();
+
+        this.close();
       }
     }
   }

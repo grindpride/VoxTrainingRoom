@@ -92,8 +92,10 @@
     }
 
     private setError(value?: string): void {
+      const valueToCheck = typeof value !== 'undefined'  ? value : this.value;
+
       if (this.validators) {
-        const hasError: InputValidator | undefined = this.validators.find(({isValid}) => !isValid(this.value || value));
+        const hasError: InputValidator | undefined = this.validators.find(({isValid}) => !isValid(valueToCheck));
 
         this.error = (hasError && hasError.error) || ''
       }

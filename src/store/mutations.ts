@@ -1,5 +1,5 @@
 import {MutationTree} from "vuex";
-import {EventCoords, EventTimeInterval, State, TimeSlotsCoords} from "@/lib/types";
+import {EventCoords, EventTimeInterval, ScheduleEvent, State, TimeSlotsCoords} from "@/lib/types";
 import {createDefaultEvent, getCoordsByTime, getTimeByCoords} from "@/lib/helpers";
 
 export const mutations: MutationTree<State> = {
@@ -51,5 +51,9 @@ export const mutations: MutationTree<State> = {
 
     state.currentEvent.startTime = startTime;
     state.currentEvent.endTime = endTime;
+  },
+
+  setCurrentEvent(state, event: ScheduleEvent) {
+    state.currentEvent = event;
   }
 };
