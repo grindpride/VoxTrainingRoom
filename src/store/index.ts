@@ -39,7 +39,7 @@ const getters: GetterTree<State, any> = {
     return categories;
   },
 
-  hasCurrentEventExist: (state) :boolean => {
+  hasCurrentEventExist: (state): boolean => {
     const currentEvents = getters.currentDateEvents(state);
 
     if (state.currentEvent && currentEvents.length) {
@@ -47,7 +47,7 @@ const getters: GetterTree<State, any> = {
         return Object.keys(state.currentEvent)
           .filter(k => k !== 'styles')
           .every((k: string) => state.currentEvent[k] === event[k])
-      })
+      });
     }
 
     return false;

@@ -50,6 +50,7 @@
             v-model="scheduleEvent.desc")
       .modal__footer
         Button(:label="hasCurrentEventExist ? 'Edit' : 'Save'" type="submit" @click="saveEvent" :disabled="hasError")
+        Button(v-if="hasCurrentEventExist" label="Delete" @click="deleteCurrentEvent" type="delete")
         Button(label="Cancel" @click="close")
 </template>
 
@@ -75,7 +76,7 @@
 
     @Mutation resetEvent!: () => void;
     @Mutation addEvent!: (event: ScheduleEvent) => void;
-
+    @Mutation deleteEvent: (event: ScheduleEvent) => void;
     @Mutation setCoords!: ({startTime, endTime}: EventTimeInterval) => void;
 
     private errors: { [key: string]: string } = {};
@@ -86,7 +87,7 @@
       return error;
     }
 
-    private isOpen: boolean = false;
+    private isOpen: boolean = true;
     private eventTypes: SelectOption[] = [
       {
         name: 'Management',
@@ -123,6 +124,12 @@
 
     beforeDestroy(): void {
       this.$root.$off('openmodal', this.open);
+    }
+
+    deleteCurrentEvent(): void {
+      this.deleteEvent(this.currentEvent);
+
+      this.close();
     }
 
     close(): void {

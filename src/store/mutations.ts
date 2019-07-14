@@ -55,5 +55,18 @@ export const mutations: MutationTree<State> = {
 
   setCurrentEvent(state, event: ScheduleEvent) {
     state.currentEvent = event;
+  },
+
+  deleteEvent(state, event: ScheduleEvent) {
+    const dateStr = state.activeDate.toDateString();
+    const currentDateEvents = state.events[dateStr];
+
+    if (currentDateEvents && currentDateEvents.length) {
+      state.events[dateStr] = currentDateEvents.filter((event: ScheduleEvent) => {
+        return !Object.keys(state.currentEvent)
+          .filter(k => k !== 'styles')
+          .every((k: string) => state.currentEvent[k] === event[k])
+      })
+    }
   }
 };

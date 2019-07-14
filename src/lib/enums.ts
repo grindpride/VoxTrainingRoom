@@ -6,7 +6,8 @@ export enum MonthTypes {
 
 export enum ButtonTypes {
   Submit = 'submit',
-  Default = 'default'
+  Default = 'default',
+  Delete = 'delete'
 }
 
 export enum InputType {

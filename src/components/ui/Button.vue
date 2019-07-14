@@ -1,3 +1,4 @@
+import {ButtonTypes} from "../../lib/enums";
 <template lang="pug">
   button.btn(:class="className" @click="$emit('click')") {{label}}
 </template>
@@ -5,7 +6,6 @@
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator';
   import {ButtonTypes} from "@/lib/enums";
-
 
 
   @Component
@@ -19,6 +19,9 @@
       switch (this.type) {
         case ButtonTypes.Submit:
           color = 'purple';
+          break;
+        case ButtonTypes.Delete:
+          color = 'red';
           break;
         case ButtonTypes.Default:
         default:
@@ -44,6 +47,7 @@
     min-height: 32px;
     width: 74px;
     line-height: normal;
+    color: var(--white);
 
     &:disabled {
       cursor: default;
@@ -52,12 +56,15 @@
 
     &_purple {
       background: #662eff;
-      color: var(--white);
     }
 
     &_gray {
       background: #f3f4f8;
       color: #495057;
+    }
+
+    &_red {
+      background: #dc3545;
     }
   }
 </style>
