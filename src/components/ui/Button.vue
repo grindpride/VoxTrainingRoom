@@ -73,6 +73,10 @@ import {ButtonTypes} from "../../lib/enums";
 
     &_red {
       background: #dc3545;
+
+      &:hover {
+        background: #bd2130;
+      }
     }
   }
 </style>

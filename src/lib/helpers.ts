@@ -126,9 +126,9 @@ export const checkIfEventsIntersectByTime = (events: ScheduleEvent[], event: Sch
     return events.some(({startTime, endTime, id}) => {
       const [startMinutes, endMinutes] = [startTime, endTime].map(countTotalMinutes);
 
-      return id !== event.id && ((startTimeTotalMinutes >= startMinutes && startTimeTotalMinutes <= endMinutes) ||
-        (endTimeTotalMinutes >= startMinutes && startTimeTotalMinutes <= startMinutes) ||
-        (startTimeTotalMinutes <= endMinutes && endTimeTotalMinutes >= endMinutes))
+      return id !== event.id && ((startTimeTotalMinutes > startMinutes && startTimeTotalMinutes < endMinutes) ||
+        (endTimeTotalMinutes > startMinutes && startTimeTotalMinutes < startMinutes) ||
+        (startTimeTotalMinutes < endMinutes && endTimeTotalMinutes > endMinutes))
     })
   }
 
@@ -147,9 +147,9 @@ export const checkIfEventsIntersectByCoords = (events: ScheduleEvent[], event: S
       const bottom = top + height;
 
 
-      return ((eventTop >= top && eventTop <= bottom) ||
-        (eventBottom >= top && eventTop <= top) ||
-        (eventTop <= bottom && eventBottom >= bottom))
+      return ((eventTop > top && eventTop < bottom) ||
+        (eventBottom > top && eventTop < top) ||
+        (eventTop < bottom && eventBottom > bottom))
     })
   }
 

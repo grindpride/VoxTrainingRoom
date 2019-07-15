@@ -12,7 +12,7 @@
       .schedule__content.vox-scroll(
         ref="scheduleContainer"
         @mousedown.left="startEventSelection"
-        @mousemove="handleMouseMove"
+        @mousemove.prevent="handleMouseMove"
         @mouseup="stopEventSelection")
         .event(v-for="hour in hours" ref="slots")
           .event__time {{hour}}
@@ -22,7 +22,7 @@
         .event__task(
           v-for="(event, ind) in currentDateEvents"
           :class="{[event.type.toLowerCase()]: true}"
-          @click="editEvent(event)"
+          @mousedown.stop="editEvent(event)"
           :style="event.styles")
           p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
           span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
@@ -119,6 +119,16 @@
         : {top: `${this.startingPoint - Math.abs(this.vectorHeight)}px`, height: `${Math.abs(this.vectorHeight)}px`}
     }
 
+    private resetCurrentEventStyles() {
+      const newStyles = this.changeEventStyles();
+
+      if (checkIfEventsIntersectByCoords(this.currentDateEvents, {...this.currentEvent, styles: newStyles})) {
+        return false;
+      }
+
+      this.setEventStyles(newStyles);
+    }
+
     private handleScroll() {
       this.currentScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
       const scrollDiff = this.currentScrollTop - this.lastScrollTop;
@@ -126,8 +136,7 @@
         this.vectorHeight = this.vectorHeight + scrollDiff;
         this.lastScrollTop = this.currentScrollTop;
 
-        const newStyles = this.changeEventStyles();
-        this.setEventStyles(newStyles);
+        this.resetCurrentEventStyles();
       }
     }
 
@@ -135,16 +144,11 @@
       if (this.isCreatingEvent) {
         const currentMousePoint = e.pageY;
         const mouseDiff = currentMousePoint - this.lastMousePoint;
+
         this.vectorHeight = this.vectorHeight + mouseDiff;
         this.lastMousePoint = currentMousePoint;
 
-        const newStyles = this.changeEventStyles();
-
-        if (checkIfEventsIntersectByCoords(this.currentDateEvents, {...this.currentEvent, styles: newStyles})) {
-          return false;
-        }
-
-        this.setEventStyles(newStyles);
+        this.resetCurrentEventStyles();
       }
     }
 
@@ -194,6 +198,7 @@
 
     private editEvent(event: ScheduleEvent) {
       this.setCurrentEvent(event);
+
       this.$root.$emit('openmodal');
     }
 
@@ -293,15 +298,24 @@
       &.design,
       &.finance,
       &.management {
+        cursor: pointer;
         position: absolute;
         width: calc(100% - 80px);
         margin-left: 80px;
+
+        &:hover {
+          opacity: 0.7;
+        }
       }
 
       &.default {
         opacity: 0.15;
         background: var(--grey-blue);
         border-left: 4px solid var(--dark-blue-100);
+
+        &:hover {
+          opacity: 0.15;
+        }
       }
 
       &.finance {

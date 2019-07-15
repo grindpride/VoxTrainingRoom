@@ -25,7 +25,7 @@
         @blur="checkError"
         @focus="resetError"
         @input="changeInput")
-      textarea(
+      textarea.vox-scroll(
         v-else
         :placeholder="placeholder"
         :id="id"
@@ -197,6 +197,7 @@
 
   .textarea {
     font-size: 12px;
+    padding-right: 0px;
     padding-top: 16px;
     height: 148px;
   }

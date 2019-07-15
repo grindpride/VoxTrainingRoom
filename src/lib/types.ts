@@ -18,7 +18,7 @@ export interface SelectOption {
 
 export interface EventBlockStyles {
   height: string,
-  display: string,
+  display?: string,
   top: string
 }
 
