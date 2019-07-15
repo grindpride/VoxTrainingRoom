@@ -35,7 +35,9 @@
 
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
-  import {checkIfEventsIntersectByCoords} from "@/lib/helpers";
+  import {checkIfEventsIntersectByCoords, range} from "@/lib/helpers";
+
+  const nineAMTopPosition = 628;
 
   @Component({
     components: {SvgIcon}
@@ -69,17 +71,13 @@
     private lastScrollTop: number = 0;
     private vectorHeight: number = 0;
 
-    private hours: string[] = [
-      "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00",
-      "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
-    ];
+    private hours: string[] = range(0, 23).map(n => `${n >= 10 ? n : `0${n}`}:00`);
 
     beforeDestroy() {
       (<HTMLElement>this.scheduleContainer).removeEventListener('scroll', this.handleScroll);
     }
 
     mounted(): void {
-      // this.scheduleContainer
       this.scheduleContainer = <HTMLElement>this.$refs.scheduleContainer;
       this.scheduleContainer.addEventListener('scroll', this.handleScroll);
       this.containerTop = this.scheduleContainer.getBoundingClientRect().top;
@@ -92,6 +90,12 @@
       this.setTimeSlotCoords(timeSlotsCoords);
 
       this.startingPoint = 0;
+
+      (<HTMLElement>this.scheduleContainer).scrollTo(0, nineAMTopPosition);
+
+      this.$root.$on('scrolllschedule', () => {
+        (<HTMLElement>this.scheduleContainer).scrollTo(0, nineAMTopPosition);
+      })
     }
 
     private getTimeSlotsCoords(): TimeSlotsCoords[] {

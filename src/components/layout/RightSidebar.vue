@@ -28,7 +28,7 @@ import {MonthTypes} from "../../lib/enums";
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-  import {State, Mutation, Getter} from 'vuex-class'
+  import {Getter, Mutation, State} from 'vuex-class'
 
   import {MonthDay} from '@/lib/types';
   import {monthNames} from "@/lib/consts";
@@ -126,6 +126,8 @@ import {MonthTypes} from "../../lib/enums";
 
       const newDate = new Date(this.calendarDate.setDate(day));
       this.changeDate(newDate);
+
+      this.$root.$emit('scrolllschedule');
     }
   }
 </script>
