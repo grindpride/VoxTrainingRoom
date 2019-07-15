@@ -4,8 +4,10 @@ import {MonthTypes} from "../../lib/enums";
   aside.calendar__wrapper
     .calendar__header
       .arrow.arrow_left(@click="changeMonth(-1)")
+        SvgIcon(name="calendar_arrow")
       h3.calendar__month  {{monthTitle}}
       .arrow.arrow_right(@click="changeMonth(1)")
+        SvgIcon(name="calendar_arrow")
     .calendar
       ul.calendar__weekdays
         li.weekday(v-for="weekday in weekDays") {{weekday}}
@@ -32,10 +34,11 @@ import {MonthTypes} from "../../lib/enums";
   import {monthNames} from "@/lib/consts";
   import {getDaysInMonth, getNextMonthDaysToDisplay, getPrevMonthDaysToDisplay, range} from "@/lib/helpers";
   import {MonthTypes} from "@/lib/enums";
+  import SvgIcon from "@/components/ui/SvgIcon.vue";
 
 
   @Component({
-    components: {}
+    components: {SvgIcon}
   })
   export default class RightSidebar extends Vue {
     @State activeDate: Date;
@@ -249,15 +252,17 @@ import {MonthTypes} from "../../lib/enums";
   }
 
   .arrow {
-    width: 16px;
-    height: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
-    transform: rotate(-45deg);
-    border-top: 2px solid var(--white);
-    border-left: 2px solid var(--white);
 
     &_right {
-      transform: rotate(135deg);
+      svg {
+        transform: rotate(180deg);
+      }
     }
   }
 </style>
