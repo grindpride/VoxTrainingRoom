@@ -2,6 +2,8 @@ import {MutationTree} from "vuex";
 import {EventCoords, EventTimeInterval, ScheduleEvent, State, TimeSlotsCoords} from "@/lib/types";
 import {createDefaultEvent, getCoordsByTime, getTimeByCoords} from "@/lib/helpers";
 
+let currentId = 0;
+
 export const mutations: MutationTree<State> = {
   changeDate(state, newDate) {
     state.activeDate = newDate;
@@ -13,6 +15,8 @@ export const mutations: MutationTree<State> = {
     if (!state.events.hasOwnProperty(dateStr)) {
       state.events = {...state.events, [dateStr]: []}
     }
+
+    event.id = currentId++;
 
     state.events[dateStr].push(event);
   },
@@ -57,16 +61,26 @@ export const mutations: MutationTree<State> = {
     state.currentEvent = event;
   },
 
+  editEvent(state, event: ScheduleEvent) {
+    const dateStr = state.activeDate.toDateString();
+    const currentDateEvents = state.events[dateStr];
+
+    if (currentDateEvents && currentDateEvents.length) {
+      const editEventInd = currentDateEvents.findIndex(ev => ev.id === event.id);
+
+      const newEvents = [...currentDateEvents.slice(0, editEventInd), event, ...currentDateEvents.slice(editEventInd + 1)];
+
+      state.events[dateStr] = newEvents;
+    }
+  },
+
   deleteEvent(state, event: ScheduleEvent) {
     const dateStr = state.activeDate.toDateString();
     const currentDateEvents = state.events[dateStr];
 
     if (currentDateEvents && currentDateEvents.length) {
-      state.events[dateStr] = currentDateEvents.filter((event: ScheduleEvent) => {
-        return !Object.keys(state.currentEvent)
-          .filter(k => k !== 'styles')
-          .every((k: string) => state.currentEvent[k] === event[k])
-      })
+      state.events[dateStr] = currentDateEvents
+        .filter((ev: ScheduleEvent) => event.id !== ev.id)
     }
   }
 };

@@ -44,9 +44,7 @@ const getters: GetterTree<State, any> = {
 
     if (state.currentEvent && currentEvents.length) {
       return currentEvents.some((event: ScheduleEvent) => {
-        return Object.keys(state.currentEvent)
-          .filter(k => k !== 'styles')
-          .every((k: string) => state.currentEvent[k] === event[k])
+        return state.currentEvent.id === event.id
       });
     }
 

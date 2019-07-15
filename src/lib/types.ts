@@ -23,6 +23,7 @@ export interface EventBlockStyles {
 }
 
 export interface ScheduleEvent {
+  id?: number,
   name: string,
   desc: string,
   startTime: string,

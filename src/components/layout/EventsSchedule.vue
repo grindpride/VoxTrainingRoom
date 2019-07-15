@@ -24,7 +24,7 @@
           :class="{[event.type.toLowerCase()]: true}"
           @click="editEvent(event)"
           :style="event.styles")
-          p {{event.name}}
+          p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
           span(v-if="event.desc") {{event.desc}}
         .event__task.default(:style="currentEvent.styles")
 </template>
@@ -188,7 +188,6 @@
     }
 
     private editEvent(event: ScheduleEvent) {
-      console.log(event);
       this.setCurrentEvent(event);
       this.$root.$emit('openmodal');
     }

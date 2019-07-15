@@ -76,6 +76,7 @@
 
     @Mutation resetEvent!: () => void;
     @Mutation addEvent!: (event: ScheduleEvent) => void;
+    @Mutation editEvent: (event: ScheduleEvent) => void;
     @Mutation deleteEvent: (event: ScheduleEvent) => void;
     @Mutation setCoords!: ({startTime, endTime}: EventTimeInterval) => void;
 
@@ -87,7 +88,7 @@
       return error;
     }
 
-    private isOpen: boolean = true;
+    private isOpen: boolean = false;
     private eventTypes: SelectOption[] = [
       {
         name: 'Management',
@@ -156,7 +157,13 @@
     saveEvent(): void {
       if (!this.hasError) {
         this.setCoords({startTime: this.scheduleEvent.startTime, endTime: this.scheduleEvent.endTime});
-        this.addEvent(this.scheduleEvent);
+
+        if (this.hasCurrentEventExist) {
+          this.editEvent(this.scheduleEvent);
+        } else {
+          this.addEvent(this.scheduleEvent);
+        }
+
         this.resetEvent();
 
         this.close();
