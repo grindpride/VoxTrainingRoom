@@ -56,11 +56,19 @@ import {ButtonTypes} from "../../lib/enums";
 
     &_purple {
       background: #662eff;
+
+      &:hover {
+        background: #5b29e5;
+      }
     }
 
     &_gray {
       background: #f3f4f8;
       color: #495057;
+
+      &:hover {
+        background: #DADBDF;
+      }
     }
 
     &_red {

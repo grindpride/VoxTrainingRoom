@@ -235,6 +235,13 @@
     svg {
       stroke: none;
     }
+
+    &:hover {
+      svg {
+        stroke: #8b8c8e;
+        fill: #8b8c8e;
+      }
+    }
   }
 
   .form-group {
