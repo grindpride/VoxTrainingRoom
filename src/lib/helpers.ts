@@ -119,7 +119,7 @@ const countTotalMinutes = (timeStr: string): number => {
     .reduce((hour, minute) => hour + (minute / 60))
 };
 
-export const checkIfEventsIntersect = (events: ScheduleEvent[], event: ScheduleEvent): boolean => {
+export const checkIfEventsIntersectByTime = (events: ScheduleEvent[], event: ScheduleEvent): boolean => {
   if (event && events && events.length) {
     const [startTimeTotalMinutes, endTimeTotalMinutes] = [event.startTime, event.endTime].map(countTotalMinutes);
 
@@ -135,3 +135,23 @@ export const checkIfEventsIntersect = (events: ScheduleEvent[], event: ScheduleE
   return false;
 };
 
+export const checkIfEventsIntersectByCoords = (events: ScheduleEvent[], event: ScheduleEvent): boolean => {
+  if (event && events && events.length) {
+    const [eventTop, eventHeight] = [event.styles.top, event.styles.height]
+      .map(s => parseInt(s, 10));
+
+    const eventBottom = eventTop + eventHeight;
+
+    return events.some(({styles, id}) => {
+      const [top, height] = [styles.top, styles.height].map(str => parseInt(str, 10));
+      const bottom = top + height;
+
+
+      return ((eventTop >= top && eventTop <= bottom) ||
+        (eventBottom >= top && eventTop <= top) ||
+        (eventTop <= bottom && eventBottom >= bottom))
+    })
+  }
+
+  return false;
+};

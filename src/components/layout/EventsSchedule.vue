@@ -35,6 +35,7 @@
 
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
+  import {checkIfEventsIntersectByCoords} from "@/lib/helpers";
 
   @Component({
     components: {SvgIcon}
@@ -138,6 +139,11 @@
         this.lastMousePoint = currentMousePoint;
 
         const newStyles = this.changeEventStyles();
+
+        if (checkIfEventsIntersectByCoords(this.currentDateEvents, {...this.currentEvent, styles: newStyles})) {
+          return false;
+        }
+
         this.setEventStyles(newStyles);
       }
     }

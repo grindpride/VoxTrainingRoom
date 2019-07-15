@@ -23,7 +23,6 @@
             name="startTime"
             @error="setError"
             :validators="timeValidators"
-            :parentError="timeError"
             v-model="scheduleEvent.startTime")
           .hyphen__wrapper
             .hyphen
@@ -35,6 +34,7 @@
             name="endTime"
             mask="##:##"
             :validators="timeValidators"
+            :parentError="timeError"
             v-model="scheduleEvent.endTime")
         .form-group
           AppSelect(
@@ -65,7 +65,7 @@
 
   import {EventTimeInterval, ScheduleEvent, SelectOption} from "@/lib/types";
   import {eventNameValidators, timeValidators} from "@/lib/validators";
-  import {checkIfEndTimeBigger, checkIfEventsIntersect} from "@/lib/helpers";
+  import {checkIfEndTimeBigger, checkIfEventsIntersectByTime} from "@/lib/helpers";
 
   @Component({
     components: {SvgIcon, AppInput, Button, AppSelect}
@@ -114,7 +114,7 @@
     }
 
     private get timeError(): string {
-      if (checkIfEventsIntersect(this.currentDateEvents, this.currentEvent)) {
+      if (checkIfEventsIntersectByTime(this.currentDateEvents, this.currentEvent)) {
         return 'Events intersect. Change time';
       }
 
