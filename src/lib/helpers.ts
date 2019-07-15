@@ -113,4 +113,25 @@ export const checkIfEndTimeBigger = (startTime: string, endTime: string): boolea
   return end > start;
 };
 
+const countTotalMinutes = (timeStr: string): number => {
+  return timeStr.split(':')
+    .map(t => parseInt(t, 10))
+    .reduce((hour, minute) => hour + (minute / 60))
+};
+
+export const checkIfEventsIntersect = (events: ScheduleEvent[], event: ScheduleEvent): boolean => {
+  if (event && events && events.length) {
+    const [startTimeTotalMinutes, endTimeTotalMinutes] = [event.startTime, event.endTime].map(countTotalMinutes);
+
+    return events.some(({startTime, endTime, id}) => {
+      const [startMinutes, endMinutes] = [startTime, endTime].map(countTotalMinutes);
+
+      return id !== event.id && ((startTimeTotalMinutes >= startMinutes && startTimeTotalMinutes <= endMinutes) ||
+        (endTimeTotalMinutes >= startMinutes && startTimeTotalMinutes <= startMinutes) ||
+        (startTimeTotalMinutes <= endMinutes && endTimeTotalMinutes >= endMinutes))
+    })
+  }
+
+  return false;
+};
 

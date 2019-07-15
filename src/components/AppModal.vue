@@ -65,13 +65,15 @@
 
   import {EventTimeInterval, ScheduleEvent, SelectOption} from "@/lib/types";
   import {eventNameValidators, timeValidators} from "@/lib/validators";
-  import {checkIfEndTimeBigger} from "@/lib/helpers";
+  import {checkIfEndTimeBigger, checkIfEventsIntersect} from "@/lib/helpers";
 
   @Component({
     components: {SvgIcon, AppInput, Button, AppSelect}
   })
   export default class AppModal extends Vue {
     @State currentEvent: ScheduleEvent;
+
+    @Getter currentDateEvents: ScheduleEvent[];
     @Getter hasCurrentEventExist: boolean;
 
     @Mutation resetEvent!: () => void;
@@ -112,8 +114,12 @@
     }
 
     private get timeError(): string {
+      if (checkIfEventsIntersect(this.currentDateEvents, this.currentEvent)) {
+        return 'Events intersect. Change time';
+      }
+
       if (!checkIfEndTimeBigger(this.currentEvent.startTime, this.currentEvent.endTime)) {
-        return "Start time can't be bigger then end time"
+        return "Start time can't be bigger then end time";
       }
 
       return "";

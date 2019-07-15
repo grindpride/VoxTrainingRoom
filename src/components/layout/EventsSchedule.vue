@@ -46,7 +46,6 @@
     @Getter dateTitle: string;
     @Getter currentDateEvents: ScheduleEvent[];
 
-
     @Mutation setTimeInterval!: ({top, bottom}: EventCoords) => void;
     @Mutation setTimeSlotCoords!: (timeSlotCoords: TimeSlotsCoords[]) => void;
     @Mutation setEventStyles!: ({top, height}: { top: string, height: string }) => void;
