@@ -63,7 +63,7 @@
   import Button from '@/components/ui/Button.vue';
   import AppSelect from "@/components/ui/AppSelect.vue";
 
-  import {EventTimeInterval, ScheduleEvent, SelectOption} from "@/lib/types";
+  import {EventTimeInterval, ScheduleEvent} from "@/lib/types";
   import {eventNameValidators, timeValidators} from "@/lib/validators";
   import {checkIfEndTimeBigger, checkIfEventsIntersectByTime} from "@/lib/helpers";
 
@@ -91,19 +91,10 @@
     }
 
     private isOpen: boolean = false;
-    private eventTypes: SelectOption[] = [
-      {
-        name: 'Management',
-        value: 'Management'
-      },
-      {
-        name: 'Design',
-        value: 'Design'
-      },
-      {
-        name: 'Finance',
-        value: 'Finance'
-      }
+    private eventTypes: string[] = [
+      'Management',
+      'Design',
+      'Finance',
     ];
 
     private eventNameValidators = eventNameValidators;

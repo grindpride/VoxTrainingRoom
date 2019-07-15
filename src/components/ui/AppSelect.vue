@@ -2,18 +2,17 @@
   .select__wrapper
     label.select__label {{label}}
     .select(@click.stop="toggleDropdown")
-      input(disabled="true" :value="selectedValue.name")
+      input(disabled="true" :value="selectedValue")
       i.icon(:class="{open: dropdownOpen}")
         SvgIcon(name="arrow")
     .select__options(v-show="dropdownOpen")
       ul
-        li(v-for="option in options" @click="selectValue(option)") {{option.value}}
+        li(v-for="option in options" @click="selectValue(option)") {{option}}
 </template>
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator';
   import SvgIcon from "@/components/ui/SvgIcon.vue";
-  import {SelectOption} from "@/lib/types";
 
 
   @Component({
@@ -21,12 +20,12 @@
   })
   export default class AppSelect extends Vue {
     @Prop() label!: string;
-    @Prop() options!: SelectOption[];
+    @Prop() options!: string[];
     @Prop() value: string;
 
 
     private dropdownOpen: boolean = false;
-    private selectedValue: SelectOption = this.options[0];
+    private selectedValue: string = this.options[0];
 
     toggleDropdown(): void {
       this.dropdownOpen = !this.dropdownOpen;
@@ -36,14 +35,18 @@
       this.dropdownOpen = false;
     }
 
-    selectValue(option: SelectOption): void {
+    selectValue(option: string): void {
       this.selectedValue = option;
-      this.$emit("input", this.selectedValue.value);
+      this.$emit("input", this.selectedValue);
       this.closeDropdown();
     }
 
     mounted() {
-      this.$emit("input", this.selectedValue.value);
+      if (this.value) {
+        this.selectedValue = this.value;
+      }
+
+      this.$emit("input", this.selectedValue);
       this.$root.$on('window:click', this.closeDropdown);
     }
 
