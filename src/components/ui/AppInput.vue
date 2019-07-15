@@ -43,9 +43,9 @@
   import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
   import {mask} from 'vue-the-mask';
 
-  import {idGenerator} from "@/lib/helpers";
   import {InputType} from "@/lib/enums";
   import {InputValidator} from "@/lib/types";
+  import {idGenerator} from "@/lib/helpers/common";
 
   const generateId: Function = idGenerator();
 

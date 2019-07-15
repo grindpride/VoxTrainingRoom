@@ -65,7 +65,7 @@
 
   import {EventTimeInterval, ScheduleEvent} from "@/lib/types";
   import {eventNameValidators, timeValidators} from "@/lib/validators";
-  import {checkIfEndTimeBigger, checkIfEventsIntersectByTime} from "@/lib/helpers";
+  import {checkIfEndTimeBigger, checkIfEventsIntersectByTime} from "@/lib/helpers/schedule";
 
   @Component({
     components: {SvgIcon, AppInput, Button, AppSelect}

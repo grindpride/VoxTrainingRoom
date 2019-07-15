@@ -1,50 +1,5 @@
 import {EventCoords, EventTimeInterval, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
 
-export const getDaysInMonth = (month: number): number => {
-  const date: Date = new Date();
-
-  return new Date(date.getFullYear(), month + 1, 0).getDate();
-};
-
-export const range = (start: number, end: number): number[] => {
-  return [...Array(end + 1).keys()].slice(start);
-};
-
-export const getPrevMonthDaysToDisplay = (weekday: number): number => {
-  switch (weekday) {
-    case 0:
-      return 6;
-    case 1:
-      return 7;
-    default:
-      return weekday - 1;
-  }
-};
-
-export const getNextMonthDaysToDisplay = (weekday: number): number => {
-  if (weekday === 0) {
-    return 7;
-  }
-
-  return 7 - weekday;
-};
-
-export const idGenerator = (): Function => {
-  const ids: string[] = [];
-
-  return function generate(): string {
-    const newId: string = Math.random().toString(10).substring(2, 5) + Math.random().toString(10).substring(2, 5);
-
-    if (!ids.includes((newId))) {
-      ids.push(newId);
-      return newId;
-    }
-
-    return generate();
-  }
-};
-
-
 export const createDefaultEvent = (): ScheduleEvent => ({
   name: '',
   desc: '',
@@ -57,12 +12,10 @@ export const createDefaultEvent = (): ScheduleEvent => ({
     top: '',
   }
 });
-
 const getMinutes = (height: number): string => {
   const minutes = Math.round((((100 * height) / 70) * 60) / 100);
   return minutes >= 10 ? `${minutes}` : `0${minutes}`;
 };
-
 export const getTimeByCoords =
   (timeSlotsCoords: TimeSlotsCoords[], {top, bottom}: EventCoords): EventTimeInterval => {
     const [startTime, endTime] = [top, bottom].map(val => {
@@ -78,7 +31,6 @@ export const getTimeByCoords =
 
     return {startTime, endTime};
   };
-
 export const getCoordsByTime =
   (timeSlotsCoords: TimeSlotsCoords[], {startTime, endTime}: EventTimeInterval): EventCoords => {
     const [top, bottom] = [startTime, endTime].map(time => {
@@ -101,8 +53,6 @@ export const getCoordsByTime =
 
     return {top, bottom};
   };
-
-
 export const checkIfEndTimeBigger = (startTime: string, endTime: string): boolean => {
   const [start, end] = [startTime, endTime].map(time => {
     const [hours, minutes] = time.split(':');
@@ -112,13 +62,11 @@ export const checkIfEndTimeBigger = (startTime: string, endTime: string): boolea
 
   return end > start;
 };
-
 const countTotalMinutes = (timeStr: string): number => {
   return timeStr.split(':')
     .map(t => parseInt(t, 10))
     .reduce((hour, minute) => hour + (minute / 60))
 };
-
 export const checkIfEventsIntersectByTime = (events: ScheduleEvent[], event: ScheduleEvent): boolean => {
   if (event && events && events.length) {
     const [startTimeTotalMinutes, endTimeTotalMinutes] = [event.startTime, event.endTime].map(countTotalMinutes);
@@ -134,7 +82,6 @@ export const checkIfEventsIntersectByTime = (events: ScheduleEvent[], event: Sch
 
   return false;
 };
-
 export const checkIfEventsIntersectByCoords = (events: ScheduleEvent[], event: ScheduleEvent): boolean => {
   if (event && events && events.length) {
     const [eventTop, eventHeight] = [event.styles.top, event.styles.height]

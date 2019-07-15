@@ -35,7 +35,8 @@
 
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
-  import {checkIfEventsIntersectByCoords, range} from "@/lib/helpers";
+  import {checkIfEventsIntersectByCoords} from "@/lib/helpers/schedule";
+  import {range} from "@/lib/helpers/common";
 
   const nineAMTopPosition = 628;
 

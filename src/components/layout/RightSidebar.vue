@@ -32,9 +32,10 @@ import {MonthTypes} from "../../lib/enums";
 
   import {MonthDay} from '@/lib/types';
   import {monthNames} from "@/lib/consts";
-  import {getDaysInMonth, getNextMonthDaysToDisplay, getPrevMonthDaysToDisplay, range} from "@/lib/helpers";
   import {MonthTypes} from "@/lib/enums";
   import SvgIcon from "@/components/ui/SvgIcon.vue";
+  import {getDaysInMonth, getNextMonthDaysToDisplay, getPrevMonthDaysToDisplay} from "@/lib/helpers/calendar";
+  import {range} from "@/lib/helpers/common";
 
 
   @Component({

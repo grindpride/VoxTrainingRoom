@@ -1,6 +1,6 @@
 import {MutationTree} from "vuex";
 import {EventCoords, EventTimeInterval, ScheduleEvent, State, TimeSlotsCoords} from "@/lib/types";
-import {createDefaultEvent, getCoordsByTime, getTimeByCoords} from "@/lib/helpers";
+import {createDefaultEvent, getCoordsByTime, getTimeByCoords} from "@/lib/helpers/schedule";
 
 let currentId = 0;
 
