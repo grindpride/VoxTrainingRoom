@@ -25,7 +25,7 @@
           @click="editEvent(event)"
           :style="event.styles")
           p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
-          span(v-if="event.desc") {{event.desc}}
+          span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
         .event__task.default(:style="currentEvent.styles")
 </template>
 
