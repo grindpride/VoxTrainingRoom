@@ -35,7 +35,7 @@
 
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
-  import {getClosestIntersectingEvent, getIntersectingEvents, hasCoordsIntersect} from "@/lib/helpers/schedule";
+  import {getClosestIntersectingEventCoords, getIntersectingEvents} from "@/lib/helpers/schedule";
   import {range} from "@/lib/helpers/common";
 
   const nineAMTopPosition = 628;
@@ -73,6 +73,8 @@
     private startingPoint: number = 0;
     private lastScrollTop: number = 0;
     private vectorHeight: number = 0;
+
+    private closestIntersectingEventCoords: { top: number, height: number } | undefined;
 
     private hours: string[] = range(0, 23).map(n => `${n >= 10 ? n : `0${n}`}:00`);
 
@@ -127,9 +129,10 @@
     }
 
     private resetCurrentEventStyles() {
-
-
       const newStyles = this.changeEventStyles();
+
+      const newStylesTop = parseInt(newStyles.top, 10);
+      const newStylesHeight = parseInt(newStyles.height, 10);
 
       const intersectingEvents = getIntersectingEvents(this.currentDateEvents, {
         ...this.currentEvent,
@@ -137,32 +140,36 @@
       });
 
       if (intersectingEvents && intersectingEvents.length) {
-        if (intersectingEvents
-          .some(ev => hasCoordsIntersect({
-            top: parseInt(newStyles.top, 10),
-            height: parseInt(newStyles.height, 10)
-          }, {top: parseInt(ev.styles.top, 10), height: parseInt(ev.styles.height)}))) {
-
-          const closestIntersectingEvent = getClosestIntersectingEvent(intersectingEvents, {
-            ...this.currentEvent,
-            styles: newStyles
-          });
+        this.closestIntersectingEventCoords = this.closestIntersectingEventCoords || getClosestIntersectingEventCoords(intersectingEvents, {
+          ...this.currentEvent,
+          styles: newStyles
+        });
 
 
-          const offset: number = Math.abs(parseInt(newStyles.top, 10)
-            - (parseInt(closestIntersectingEvent.styles.top, 10) + parseInt(closestIntersectingEvent.styles.height, 10)));
+        let newTop = newStylesTop;
+        let newHeight = newStylesHeight;
 
-          const newTop: number = parseInt(newStyles.top, 10) + offset;
-          const newHeight = this.startingPoint - newTop;
+        if (newStylesTop !== parseInt(this.currentEvent.styles.top, 10)) {
+          const topOffset: number = Math.abs(newStylesTop
+            - (this.closestIntersectingEventCoords.top + this.closestIntersectingEventCoords.height));
 
-          // console.log(newStyles.top, newStyles.height);
+          newTop += topOffset;
+          newHeight = this.startingPoint - newTop;
 
+        } else {
+          const heightOffset = (newStylesTop + newStylesHeight) - this.closestIntersectingEventCoords.top;
 
-          newStyles.top = `${newTop}px`;
-
-          newStyles.height = `${newHeight}px`;
+          newHeight -= heightOffset
         }
+
+        newStyles.top = `${newTop}px`;
+        newStyles.height = `${newHeight}px`;
+
+
+      } else {
+        this.closestIntersectingEventCoords = undefined;
       }
+
 
       this.setEventStyles(newStyles);
     }

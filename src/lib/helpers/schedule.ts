@@ -109,12 +109,12 @@ export const getIntersectingEvents = (events: ScheduleEvent[], event: ScheduleEv
   return undefined;
 };
 
-export const getClosestIntersectingEvent = (events: ScheduleEvent[], event: ScheduleEvent): ScheduleEvent => {
+export const getClosestIntersectingEventCoords = (events: ScheduleEvent[], event: ScheduleEvent): { top: number, height: number } | undefined => {
   if (events && events.length && event) {
     const top = parseInt(event.styles.top, 10);
     const bottom = top + parseInt(event.styles.height, 10);
 
-    return events.reduce((prev, curr) => {
+    const closestEvent = events.reduce((prev, curr) => {
       const prevTop = parseInt(prev.styles.top, 10);
       const currTop = parseInt(curr.styles.top, 10);
 
@@ -125,8 +125,10 @@ export const getClosestIntersectingEvent = (events: ScheduleEvent[], event: Sche
         Math.abs(bottom - currBottom) < Math.abs(bottom - prevBottom);
 
       return closeCondition ? curr : prev;
+    });
 
-    })
+    return {top: parseInt(closestEvent.styles.top, 10), height: parseInt(closestEvent.styles.height, 10)}
   }
 
+  return undefined;
 };
