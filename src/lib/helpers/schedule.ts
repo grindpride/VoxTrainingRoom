@@ -82,23 +82,48 @@ export const checkIfEventsIntersectByTime = (events: ScheduleEvent[], event: Sch
 
   return false;
 };
-export const checkIfEventsIntersectByCoords = (events: ScheduleEvent[], event: ScheduleEvent): boolean => {
+
+export const hasCoordsIntersect = (coords1: { top: number, height: number }, coords2: { top: number, height: number }): boolean => {
+  const coords1Bottom = coords1.top + coords1.height;
+  const coords2Bottom = coords2.top + coords2.height;
+
+
+  return ((coords1.top > coords2.top && coords1.top < coords2Bottom) ||
+    (coords1Bottom > coords2.top && coords1.top < coords2.top) ||
+    (coords1.top < coords2Bottom && coords1Bottom > coords2Bottom))
+};
+
+export const getIntersectingEvents = (events: ScheduleEvent[], event: ScheduleEvent): ScheduleEvent[] | undefined => {
   if (event && events && events.length) {
     const [eventTop, eventHeight] = [event.styles.top, event.styles.height]
       .map(s => parseInt(s, 10));
 
-    const eventBottom = eventTop + eventHeight;
 
-    return events.some(({styles, id}) => {
-      const [top, height] = [styles.top, styles.height].map(str => parseInt(str, 10));
-      const bottom = top + height;
-
-
-      return ((eventTop > top && eventTop < bottom) ||
-        (eventBottom > top && eventTop < top) ||
-        (eventTop < bottom && eventBottom > bottom))
-    })
+    return events
+      .filter(({styles}) => hasCoordsIntersect({top: eventTop, height: eventHeight}, {
+        top: parseInt(styles.top, 10),
+        height: parseInt(styles.height, 10)
+      }))
   }
 
-  return false;
+  return undefined;
+};
+
+export const getClosestIntersectingEvent = (events: ScheduleEvent[], event: ScheduleEvent): ScheduleEvent => {
+  const top = parseInt(event.styles.top, 10);
+  const bottom = top + parseInt(event.styles.height, 10);
+
+  return events.reduce((prev, curr) => {
+    const prevTop = parseInt(prev.styles.top, 10);
+    const currTop = parseInt(curr.styles.top, 10);
+
+    const prevBottom = prevTop + parseInt(prev.styles.height, 10);
+    const currBottom = currTop + parseInt(curr.styles.height, 10);
+
+    const closeCondition = Math.abs(top - currTop) < Math.abs(top - prevTop) ||
+      Math.abs(bottom - currBottom) < Math.abs(bottom - prevBottom);
+
+    return closeCondition ? curr : prev;
+
+  })
 };

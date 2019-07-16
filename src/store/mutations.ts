@@ -30,8 +30,13 @@ export const mutations: MutationTree<State> = {
   },
 
   setEventStyles(state, {top, height}) {
-    state.currentEvent.styles.top = top;
-    state.currentEvent.styles.height = height;
+    if (top) {
+      state.currentEvent.styles.top = top;
+    }
+
+    if (height) {
+      state.currentEvent.styles.height = height;
+    }
   },
 
   setCoords(state, {startTime, endTime}) {

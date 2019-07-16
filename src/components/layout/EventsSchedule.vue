@@ -22,7 +22,7 @@
         .event__task(
           v-for="(event, ind) in currentDateEvents"
           :class="{[event.type.toLowerCase()]: true}"
-          @mousedown.stop="editEvent(event)"
+          @mousedown.left.stop="editEvent(event)"
           :style="event.styles")
           p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
           span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
@@ -35,7 +35,7 @@
 
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
-  import {checkIfEventsIntersectByCoords} from "@/lib/helpers/schedule";
+  import {getClosestIntersectingEvent, getIntersectingEvents, hasCoordsIntersect} from "@/lib/helpers/schedule";
   import {range} from "@/lib/helpers/common";
 
   const nineAMTopPosition = 628;
@@ -61,6 +61,8 @@
     };
 
     private isCreatingEvent: boolean = false;
+    private isIntersecting: boolean = false;
+
     private scheduleContainer: HTMLElement | null = null;
     private containerTop: number = 0;
     private paddingHeight: number = 0;
@@ -125,11 +127,56 @@
     }
 
     private resetCurrentEventStyles() {
+
+
       const newStyles = this.changeEventStyles();
 
-      if (checkIfEventsIntersectByCoords(this.currentDateEvents, {...this.currentEvent, styles: newStyles})) {
-        return false;
+      const intersectingEvents = getIntersectingEvents(this.currentDateEvents, {
+        ...this.currentEvent,
+        styles: newStyles
+      });
+
+      if (intersectingEvents && intersectingEvents.length) {
+        if (intersectingEvents
+          .some(ev => hasCoordsIntersect({
+            top: parseInt(newStyles.top, 10),
+            height: parseInt(newStyles.height, 10)
+          }, {top: parseInt(ev.styles.top, 10), height: parseInt(ev.styles.height)}))) {
+
+          const closestIntersectingEvent = getClosestIntersectingEvent(intersectingEvents, {
+            ...this.currentEvent,
+            styles: newStyles
+          });
+
+
+          const newTop: number = parseInt(newStyles.top, 10) > parseInt(closestIntersectingEvent.styles.top, 10)
+            ? parseInt(closestIntersectingEvent.styles.top, 10) + parseInt(closestIntersectingEvent.styles.height, 10) + 1
+            : parseInt(newStyles.top, 10);
+
+          const newHeight = this.startingPoint - newTop;
+
+          console.log(newStyles.top, newStyles.height);
+
+          if (parseInt(newStyles.top, 10) + parseInt(newStyles.height, 10) > parseInt(closestIntersectingEvent.styles.top, 10)) {
+            console.log('Are you sure ?')
+          }
+
+
+          newStyles.top = `${newTop}px`;
+          newStyles.height = `${newHeight}px`;
+
+          if (parseInt(closestIntersectingEvent.styles.top, 10) >= parseInt(newStyles.top, 10)) {
+
+            return false;
+          }
+
+
+        }
+
+
       }
+
+      // console.log('MAN');
 
       this.setEventStyles(newStyles);
     }
@@ -198,6 +245,7 @@
         }
       }
 
+      this.isIntersecting = false;
       this.isCreatingEvent = false;
     }
 
