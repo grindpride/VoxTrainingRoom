@@ -110,20 +110,23 @@ export const getIntersectingEvents = (events: ScheduleEvent[], event: ScheduleEv
 };
 
 export const getClosestIntersectingEvent = (events: ScheduleEvent[], event: ScheduleEvent): ScheduleEvent => {
-  const top = parseInt(event.styles.top, 10);
-  const bottom = top + parseInt(event.styles.height, 10);
+  if (events && events.length && event) {
+    const top = parseInt(event.styles.top, 10);
+    const bottom = top + parseInt(event.styles.height, 10);
 
-  return events.reduce((prev, curr) => {
-    const prevTop = parseInt(prev.styles.top, 10);
-    const currTop = parseInt(curr.styles.top, 10);
+    return events.reduce((prev, curr) => {
+      const prevTop = parseInt(prev.styles.top, 10);
+      const currTop = parseInt(curr.styles.top, 10);
 
-    const prevBottom = prevTop + parseInt(prev.styles.height, 10);
-    const currBottom = currTop + parseInt(curr.styles.height, 10);
+      const prevBottom = prevTop + parseInt(prev.styles.height, 10);
+      const currBottom = currTop + parseInt(curr.styles.height, 10);
 
-    const closeCondition = Math.abs(top - currTop) < Math.abs(top - prevTop) ||
-      Math.abs(bottom - currBottom) < Math.abs(bottom - prevBottom);
+      const closeCondition = Math.abs(top - currTop) < Math.abs(top - prevTop) ||
+        Math.abs(bottom - currBottom) < Math.abs(bottom - prevBottom);
 
-    return closeCondition ? curr : prev;
+      return closeCondition ? curr : prev;
 
-  })
+    })
+  }
+
 };

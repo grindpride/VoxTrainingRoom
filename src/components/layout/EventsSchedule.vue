@@ -149,34 +149,20 @@
           });
 
 
-          const newTop: number = parseInt(newStyles.top, 10) > parseInt(closestIntersectingEvent.styles.top, 10)
-            ? parseInt(closestIntersectingEvent.styles.top, 10) + parseInt(closestIntersectingEvent.styles.height, 10) + 1
-            : parseInt(newStyles.top, 10);
+          const offset: number = Math.abs(parseInt(newStyles.top, 10)
+            - (parseInt(closestIntersectingEvent.styles.top, 10) + parseInt(closestIntersectingEvent.styles.height, 10)));
 
+          const newTop: number = parseInt(newStyles.top, 10) + offset;
           const newHeight = this.startingPoint - newTop;
 
-          console.log(newStyles.top, newStyles.height);
-
-          if (parseInt(newStyles.top, 10) + parseInt(newStyles.height, 10) > parseInt(closestIntersectingEvent.styles.top, 10)) {
-            console.log('Are you sure ?')
-          }
+          // console.log(newStyles.top, newStyles.height);
 
 
           newStyles.top = `${newTop}px`;
+
           newStyles.height = `${newHeight}px`;
-
-          if (parseInt(closestIntersectingEvent.styles.top, 10) >= parseInt(newStyles.top, 10)) {
-
-            return false;
-          }
-
-
         }
-
-
       }
-
-      // console.log('MAN');
 
       this.setEventStyles(newStyles);
     }
