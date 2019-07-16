@@ -1,4 +1,4 @@
-import {EventCoords, EventTimeInterval, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
+import {EventCoords, EventStyles, EventTimeInterval, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
 
 export const createDefaultEvent = (): ScheduleEvent => ({
   name: '',
@@ -16,6 +16,7 @@ const getMinutes = (height: number): string => {
   const minutes = Math.round((((100 * height) / 70) * 60) / 100);
   return minutes >= 10 ? `${minutes}` : `0${minutes}`;
 };
+
 export const getTimeByCoords =
   (timeSlotsCoords: TimeSlotsCoords[], {top, bottom}: EventCoords): EventTimeInterval => {
     const [startTime, endTime] = [top, bottom].map(val => {
@@ -31,6 +32,7 @@ export const getTimeByCoords =
 
     return {startTime, endTime};
   };
+
 export const getCoordsByTime =
   (timeSlotsCoords: TimeSlotsCoords[], {startTime, endTime}: EventTimeInterval): EventCoords => {
     const [top, bottom] = [startTime, endTime].map(time => {
@@ -53,6 +55,7 @@ export const getCoordsByTime =
 
     return {top, bottom};
   };
+
 export const checkIfEndTimeBigger = (startTime: string, endTime: string): boolean => {
   const [start, end] = [startTime, endTime].map(time => {
     const [hours, minutes] = time.split(':');
@@ -62,11 +65,13 @@ export const checkIfEndTimeBigger = (startTime: string, endTime: string): boolea
 
   return end > start;
 };
+
 const countTotalMinutes = (timeStr: string): number => {
   return timeStr.split(':')
     .map(t => parseInt(t, 10))
     .reduce((hour, minute) => hour + (minute / 60))
 };
+
 export const checkIfEventsIntersectByTime = (events: ScheduleEvent[], event: ScheduleEvent): boolean => {
   if (event && events && events.length) {
     const [startTimeTotalMinutes, endTimeTotalMinutes] = [event.startTime, event.endTime].map(countTotalMinutes);
@@ -83,7 +88,7 @@ export const checkIfEventsIntersectByTime = (events: ScheduleEvent[], event: Sch
   return false;
 };
 
-export const hasCoordsIntersect = (coords1: { top: number, height: number }, coords2: { top: number, height: number }): boolean => {
+export const hasCoordsIntersect = (coords1: EventStyles, coords2: EventStyles): boolean => {
   const coords1Bottom = coords1.top + coords1.height;
   const coords2Bottom = coords2.top + coords2.height;
 
@@ -93,12 +98,8 @@ export const hasCoordsIntersect = (coords1: { top: number, height: number }, coo
     (coords1.top < coords2Bottom && coords1Bottom > coords2Bottom))
 };
 
-export const getIntersectingEvents = (events: ScheduleEvent[], event: ScheduleEvent): ScheduleEvent[] | undefined => {
-  if (event && events && events.length) {
-    const [eventTop, eventHeight] = [event.styles.top, event.styles.height]
-      .map(s => parseInt(s, 10));
-
-
+export const getIntersectingEvents = (events: ScheduleEvent[], {top: eventTop, height: eventHeight}: EventStyles): ScheduleEvent[] | undefined => {
+  if (events && events.length) {
     return events
       .filter(({styles}) => hasCoordsIntersect({top: eventTop, height: eventHeight}, {
         top: parseInt(styles.top, 10),
@@ -109,10 +110,9 @@ export const getIntersectingEvents = (events: ScheduleEvent[], event: ScheduleEv
   return undefined;
 };
 
-export const getClosestIntersectingEventCoords = (events: ScheduleEvent[], event: ScheduleEvent): { top: number, height: number } | undefined => {
+export const getClosestIntersectingEventCoords = (events: ScheduleEvent[], {top, height}: EventStyles): EventStyles | undefined => {
   if (events && events.length && event) {
-    const top = parseInt(event.styles.top, 10);
-    const bottom = top + parseInt(event.styles.height, 10);
+    const bottom = top + height;
 
     const closestEvent = events.reduce((prev, curr) => {
       const prevTop = parseInt(prev.styles.top, 10);

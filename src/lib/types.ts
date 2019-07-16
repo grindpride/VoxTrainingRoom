@@ -46,7 +46,12 @@ export interface EventTimeInterval {
 
 export interface EventCoords {
   top: number,
-  bottom: number
+  bottom: number,
+}
+
+export interface EventStyles {
+  top: number,
+  height: number,
 }
 
 export interface DateEventsMap {
