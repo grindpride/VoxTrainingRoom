@@ -335,10 +335,6 @@
         position: absolute;
         width: calc(100% - 80px);
         margin-left: 80px;
-
-        &:hover {
-          opacity: 0.7;
-        }
       }
 
       &.default {
@@ -346,26 +342,33 @@
         background: var(--grey-blue);
         border-left: 4px solid var(--dark-blue-100);
 
-        &:hover {
-          opacity: 0.15;
-        }
       }
 
       &.finance {
         background: rgba(133, 118, 237, 0.15);
         border-left: 4px solid #8576ed;
+
+        &:hover {
+          background: rgba(133, 118, 237, 0.3);
+        }
       }
 
       &.design {
         background: rgba(61, 131, 249, 0.15);
-        height: 250%;
         border-left: 4px solid #3d83f9;
+
+        &:hover {
+          background: rgba(61, 131, 249, 0.3);
+        }
       }
 
       &.management {
         background: rgba(238, 165, 124, 0.15);
         border-left: 4px solid #eea57c;
-        height: 200%;
+
+        &:hover {
+          background: rgba(238, 165, 124, 0.3);
+        }
       }
 
       p,
