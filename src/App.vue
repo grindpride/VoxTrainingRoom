@@ -24,14 +24,26 @@
   export default class App extends Vue {
     mounted() {
       window.addEventListener('click', this.emitWindowClick);
+      window.addEventListener('mousemove', this.emitMouseMove);
+      window.addEventListener('mouseup', this.emitMouseUp);
     }
 
     beforeDestroy() {
       window.removeEventListener('click', this.emitWindowClick);
+      window.removeEventListener('mousemove', this.emitMouseMove);
+      window.removeEventListener('mouseup', this.emitMouseUp);
     }
 
     private emitWindowClick(e: Event) {
       this.$root.$emit('window:click', e);
+    }
+
+    private emitMouseMove(e: Event) {
+      this.$root.$emit('window:mousemove', e)
+    }
+
+    private emitMouseUp(e: Event) {
+      this.$root.$emit('window:mouseup', e)
     }
   }
 </script>

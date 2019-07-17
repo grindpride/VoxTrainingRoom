@@ -11,9 +11,7 @@
             SvgIcon(name="layout")
       .schedule__content.vox-scroll(
         ref="scheduleContainer"
-        @mousedown.left="startEventSelection"
-        @mousemove="handleMouseMove"
-        @mouseup="stopEventSelection")
+        @mousedown.left="startEventSelection")
         .event(v-for="hour in hours" ref="slots")
           .event__time {{hour}}
           .event__desc
@@ -21,12 +19,13 @@
             .event__task
         .event__task(
           v-for="(event, ind) in currentDateEvents"
-          :class="{[event.type.toLowerCase()]: true}"
+          :class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}"
           @mousedown.left.stop="editEvent(event)"
           :style="event.styles")
           p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
           span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
-        .event__task.default(:style="currentEvent.styles")
+        .event__task.default(
+          :style="currentEvent.styles")
 </template>
 
 <script lang="ts">
@@ -80,6 +79,9 @@
 
     beforeDestroy() {
       (<HTMLElement>this.scheduleContainer).removeEventListener('scroll', this.handleScroll);
+
+      this.$root.$off('window:mousemove', this.handleMouseMove);
+      this.$root.$off('window:mouseup', this.stopEventSelection);
     }
 
     mounted(): void {
@@ -100,7 +102,10 @@
 
       this.$root.$on('scrolllschedule', () => {
         (<HTMLElement>this.scheduleContainer).scrollTo(0, nineAMTopPosition);
-      })
+      });
+
+      this.$root.$on('window:mousemove', this.handleMouseMove);
+      this.$root.$on('window:mouseup', this.stopEventSelection);
     }
 
     private getTimeSlotsCoords(): TimeSlotsCoords[] {
@@ -174,6 +179,11 @@
 
     private handleMouseMove(e: MouseEvent) {
       if (this.isCreatingEvent) {
+
+        if (e.pageY > (<HTMLElement>this.scheduleContainer).getBoundingClientRect().bottom) {
+          return false;
+        }
+
         const currentMousePoint = e.pageY;
         const mouseDiff = currentMousePoint - this.lastMousePoint;
 
@@ -352,7 +362,7 @@
         background: rgba(133, 118, 237, 0.15);
         border-left: 4px solid #8576ed;
 
-        &:hover {
+        &.hover:hover {
           background: rgba(133, 118, 237, 0.3);
         }
       }
@@ -361,7 +371,7 @@
         background: rgba(61, 131, 249, 0.15);
         border-left: 4px solid #3d83f9;
 
-        &:hover {
+        &.hover:hover {
           background: rgba(61, 131, 249, 0.3);
         }
       }
@@ -370,7 +380,7 @@
         background: rgba(238, 165, 124, 0.15);
         border-left: 4px solid #eea57c;
 
-        &:hover {
+        &.hover:hover {
           background: rgba(238, 165, 124, 0.3);
         }
       }
