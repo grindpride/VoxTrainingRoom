@@ -245,11 +245,11 @@
 
     svg {
       stroke: none;
+      fill: #9FA6B3;
     }
 
     &:hover {
       svg {
-        stroke: #8b8c8e;
         fill: #8b8c8e;
       }
     }
