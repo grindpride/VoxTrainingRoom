@@ -17,14 +17,17 @@
           .event__desc
             .event__time-line
             .event__task
-        .event__task(
-          v-for="(event, ind) in currentDateEvents"
+        .event__wrapper(
+          v-for="(event) in currentDateEvents"
           :class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}"
           @mousedown.left.stop="editEvent(event)"
           :style="event.styles")
-          p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
-          span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
-        .event__task.default(
+          .event__mover_up(:class="{'hover': parseInt(currentEvent.styles.height) === 0.}")
+          .event__mover_down(:class="{'hover': parseInt(currentEvent.styles.height) === 0}")
+          .event__task(:class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}")
+            p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
+            span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
+        .event__wrapper.default(
           :style="currentEvent.styles")
 </template>
 
@@ -322,7 +325,7 @@
       width: 100%;
     }
 
-    &__task {
+    &__wrapper {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -359,28 +362,16 @@
       &.finance {
         background: rgba(133, 118, 237, 0.15);
         border-left: 4px solid #8576ed;
-
-        &.hover:hover {
-          background: rgba(133, 118, 237, 0.3);
-        }
       }
 
       &.design {
         background: rgba(61, 131, 249, 0.15);
         border-left: 4px solid #3d83f9;
-
-        &.hover:hover {
-          background: rgba(61, 131, 249, 0.3);
-        }
       }
 
       &.management {
         background: rgba(238, 165, 124, 0.15);
         border-left: 4px solid #eea57c;
-
-        &.hover:hover {
-          background: rgba(238, 165, 124, 0.3);
-        }
       }
 
       p,
@@ -401,6 +392,73 @@
         max-width: 310px;
         font-size: 14px;
         opacity: 0.7;
+      }
+    }
+
+    &__task {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      &.finance.hover:hover {
+        background: rgba(133, 118, 237, 0.3);
+      }
+
+
+      &.design.hover:hover {
+        background: rgba(61, 131, 249, 0.3);
+      }
+
+
+      &.management.hover:hover {
+        background: rgba(238, 165, 124, 0.3);
+      }
+    }
+
+
+    &__mover_up,
+    &__mover_down {
+      width: calc(100% + 4px);
+      height: 20px;
+      left: -4px;
+      position: absolute;
+
+      &.hover {
+        cursor: n-resize;
+      }
+    }
+
+    &__mover_up {
+      top: -10px;
+
+      &.hover:hover ~ .event__task.finance {
+        background: linear-gradient(to bottom, rgba(133, 118, 237, 0.30) 30%, rgba(133, 118, 237, 0.15));
+      }
+
+      &.hover:hover ~ .event__task.management {
+        background: linear-gradient(to bottom, rgba(238, 165, 124, 0.30) 30%, rgba(238, 165, 124, 0.15));
+      }
+
+      &.hover:hover ~ .event__task.design {
+        background: linear-gradient(to bottom, rgba(61, 131, 249, 0.30) 30%, rgba(61, 131, 249, 0.15));
+      }
+    }
+
+    &__mover_down {
+      bottom: -10px;
+
+      &.hover:hover + .event__task.finance {
+        background: linear-gradient(to bottom, rgba(133, 118, 237, 0.15) 70%, rgba(133, 118, 237, 0.30));
+      }
+
+      &.hover:hover + .event__task.management {
+        background: linear-gradient(to bottom, rgba(238, 165, 124, 0.15) 70%, rgba(238, 165, 124, 0.30));
+      }
+
+      &.hover:hover + .event__task.design {
+        background: linear-gradient(to bottom, rgba(61, 131, 249, 0.15) 70%, rgba(61, 131, 249, 0.30));
       }
     }
   }
