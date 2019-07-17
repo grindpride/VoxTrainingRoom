@@ -32,15 +32,15 @@ const getters: GetterTree<State, any> = {
   },
 
   currentDateCategories: state => {
-    const currentEvents = getters.currentDateEvents(state);
+    const currentEvents = store.getters.currentDateEvents;
 
-    const categories = Array.from(new Set(currentEvents.map(({type}) => type)));
+    const categories = Array.from(new Set(currentEvents.map(({type}: { type: string }) => type)));
 
     return categories;
   },
 
   hasCurrentEventExist: (state): boolean => {
-    const currentEvents = getters.currentDateEvents(state);
+    const currentEvents = store.getters.currentDateEvents;
 
     if (state.currentEvent && currentEvents.length) {
       return currentEvents.some((event: ScheduleEvent) => {
