@@ -1,11 +1,11 @@
 <template lang="pug">
   aside.left-sidebar
     .menu
-      .menu__title Menu
+      p.menu__title Menu
       .menu__item(v-for="{name, icon} in listItems")
         .menu__item-logo
           SvgIcon(:name="icon")
-        | {{name}}
+          span {{name}}
 </template>
 
 <script lang="ts">
@@ -55,6 +55,13 @@
 
         &-logo {
           margin-right: 26px;
+          display: flex;
+          align-items: center;
+
+        }
+
+        svg {
+          margin-right: 20px;
         }
 
         &:hover {

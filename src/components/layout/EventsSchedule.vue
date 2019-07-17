@@ -12,7 +12,7 @@
       .schedule__content.vox-scroll(
         ref="scheduleContainer"
         @mousedown.left="startEventSelection"
-        @mousemove.prevent="handleMouseMove"
+        @mousemove="handleMouseMove"
         @mouseup="stopEventSelection")
         .event(v-for="hour in hours" ref="slots")
           .event__time {{hour}}
@@ -335,6 +335,10 @@
         position: absolute;
         width: calc(100% - 80px);
         margin-left: 80px;
+
+        &:hover {
+          transition: background 0.3s ease;
+        }
       }
 
       &.default {

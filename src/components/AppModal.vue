@@ -1,5 +1,5 @@
 <template lang="pug">
-  .modal__wrapper(v-if="isOpen" @keydown.enter="saveEvent")
+  .modal__wrapper(v-if="isOpen" @keydown.enter="saveEvent" )
     .modal
       .modal__header
         p.modal__title {{hasCurrentEventExist ? 'Edit event' : 'Add event'}}
@@ -50,8 +50,9 @@
             v-model="scheduleEvent.desc")
       .modal__footer
         Button(:label="hasCurrentEventExist ? 'Edit' : 'Save'" type="submit" @click="saveEvent" :disabled="hasError")
-        Button(v-if="hasCurrentEventExist" label="Delete" @click="deleteCurrentEvent" type="delete")
         Button(label="Cancel" @click="close")
+        .flexspace(v-if="hasCurrentEventExist")
+        Button(v-if="hasCurrentEventExist" label="Delete" @click="deleteCurrentEvent" type="delete")
 </template>
 
 <script lang="ts">
@@ -118,10 +119,20 @@
 
     mounted(): void {
       this.$root.$on('openmodal', this.open);
+
+      window.addEventListener("keydown", this.handleKeyPress, false);
     }
 
     beforeDestroy(): void {
       this.$root.$off('openmodal', this.open);
+
+      window.removeEventListener("keydown", this.handleKeyPress, false);
+    }
+
+    private handleKeyPress(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        this.close();// Ну или что там у тебя.
+      }
     }
 
     deleteCurrentEvent(): void {
