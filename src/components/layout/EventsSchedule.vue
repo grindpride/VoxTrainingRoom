@@ -252,7 +252,7 @@
 
     private resizeEvent(e: MouseEvent, event: ScheduleEvent) {
       this.setCurrentEvent(event);
-
+    }
 
   }
 </script>
