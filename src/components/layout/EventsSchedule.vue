@@ -20,11 +20,15 @@
         .event__wrapper(
           v-for="(event) in currentDateEvents"
           :class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}"
-          @mousedown.left.stop="editEvent(event)"
           :style="event.styles")
-          .event__mover_up(:class="{'hover': parseInt(currentEvent.styles.height) === 0.}")
-          .event__mover_down(:class="{'hover': parseInt(currentEvent.styles.height) === 0}")
-          .event__task(:class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}")
+          .event__mover_up(
+            @mousedown="resizeEvent($event, event)"
+            :class="{'hover': parseInt(currentEvent.styles.height) === 0.}")
+          .event__mover_down(
+            :class="{'hover': parseInt(currentEvent.styles.height) === 0}")
+          .event__task(
+            @mousedown.left.stop="editEvent(event)"
+            :class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}")
             p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
             span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
         .event__wrapper.default(
@@ -245,6 +249,10 @@
 
       this.$root.$emit('openmodal');
     }
+
+    private resizeEvent(e: MouseEvent, event: ScheduleEvent) {
+      this.setCurrentEvent(event);
+
 
   }
 </script>
