@@ -36,15 +36,13 @@
   import {EventCoords, EventStyles, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
   import {getClosestIntersectingEventCoords, getIntersectingEvents} from "@/lib/helpers/schedule";
   import {range} from "@/lib/helpers/common";
-
-  const nineAMTopPosition = 628;
+  import {nineAMTopPosition} from "@/lib/consts";
 
   @Component({
     components: {SvgIcon}
   })
   export default class EventsSchedule extends Vue {
     @State currentEvent: ScheduleEvent;
-    @State timeSlotsCoords: TimeSlotsCoords | null = null;
 
     @Getter dateTitle: string;
     @Getter currentDateEvents: ScheduleEvent[];

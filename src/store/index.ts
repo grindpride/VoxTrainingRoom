@@ -8,7 +8,6 @@ import {createDefaultEvent} from "@/lib/helpers/schedule";
 
 Vue.use(Vuex);
 
-
 const state: State = {
   activeDate: new Date(),
   events: {},
@@ -31,7 +30,7 @@ const getters: GetterTree<State, any> = {
     return [];
   },
 
-  currentDateCategories: state => {
+  currentDateCategories: () => {
     const currentEvents = store.getters.currentDateEvents;
 
     const categories = Array.from(new Set(currentEvents.map(({type}: { type: string }) => type)));
