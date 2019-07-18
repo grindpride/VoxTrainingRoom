@@ -135,6 +135,12 @@
       let newTop = this.vectorHeight > 0 ? this.startingPoint : this.startingPoint - Math.abs(this.vectorHeight);
       let newHeight = this.vectorHeight > 0 ? this.vectorHeight : Math.abs(this.vectorHeight);
 
+      if (this.editing) {
+        newHeight = parseInt(this.currentEvent.styles.height, 10) + Math.abs(this.vectorHeight);
+      }
+
+      console.log(newTop, newHeight);
+
 
       const intersectingEvents = getIntersectingEvents(this.currentDateEvents,
         {top: newTop, height: newHeight}
@@ -251,6 +257,28 @@
 
     private resizeEvent(e: MouseEvent, event: ScheduleEvent) {
       this.setCurrentEvent(event);
+      this.editing = true;
+
+      this.lastMousePoint = e.pageY;
+      this.startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
+      this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
+
+
+      const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
+
+      if (withinPadding) {
+        return false;
+      }
+
+      if (!this.isCreatingEvent) {
+        this.isCreatingEvent = true;
+        this.currentEvent.styles.display = 'flex';
+        this.startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
+        this.currentEventTop = this.startingPoint;
+
+        this.currentEvent.styles.top = `${this.startingPoint}px`;
+      }
+
     }
 
   }
@@ -380,6 +408,7 @@
       &.finance,
       &.management {
         cursor: pointer;
+
         &:hover {
           transition: background 0.3s ease;
         }
