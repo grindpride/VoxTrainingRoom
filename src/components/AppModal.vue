@@ -1,5 +1,5 @@
 <template lang="pug">
-  .modal__wrapper(v-if="isOpen" @keydown.enter="saveEvent" )
+  .modal__wrapper(v-if="isOpen" @keydown.enter="saveEvent" @mouseup.stop )
     .modal
       .modal__header
         p.modal__title {{hasCurrentEventExist ? 'Edit event' : 'Add event'}}
@@ -13,7 +13,7 @@
             name="eventName"
             :validators="eventNameValidators"
             @error="setError"
-            v-model="scheduleEvent.name")
+            v-model="currentEvent.name")
         .form-group
           AppInput(
             placeholder="09:00"
@@ -23,7 +23,7 @@
             name="startTime"
             @error="setError"
             :validators="timeValidators"
-            v-model="scheduleEvent.startTime")
+            v-model="currentEvent.startTime")
           .hyphen__wrapper
             .hyphen
           AppInput(
@@ -35,11 +35,11 @@
             mask="##:##"
             :validators="timeValidators"
             :parentError="timeError"
-            v-model="scheduleEvent.endTime")
+            v-model="currentEvent.endTime")
         .form-group
           AppSelect(
             :options="eventTypes"
-            v-model="scheduleEvent.type"
+            v-model="currentEvent.type"
             label="Event type")
         .form-group
           AppInput(
@@ -47,7 +47,7 @@
             label="Event"
             type="textarea"
             name="eventDesc"
-            v-model="scheduleEvent.desc")
+            v-model="currentEvent.desc")
       .modal__footer
         Button(:label="hasCurrentEventExist ? 'Edit' : 'Save'" type="submit" @click="saveEvent" :disabled="hasError")
         Button(label="Cancel" @click="close")
@@ -101,7 +101,7 @@
     private eventNameValidators = eventNameValidators;
     private timeValidators = timeValidators;
 
-    private get scheduleEvent() {
+    private get currentEvent() {
       return this.currentEvent
     }
 
@@ -164,12 +164,12 @@
 
     saveEvent(): void {
       if (!this.hasError) {
-        this.setCoords({startTime: this.scheduleEvent.startTime, endTime: this.scheduleEvent.endTime});
+        this.setCoords({startTime: this.currentEvent.startTime, endTime: this.currentEvent.endTime});
 
         if (this.hasCurrentEventExist) {
-          this.editEvent(this.scheduleEvent);
+          this.editEvent(this.currentEvent);
         } else {
-          this.addEvent(this.scheduleEvent);
+          this.addEvent(this.currentEvent);
         }
 
         this.resetEvent();
