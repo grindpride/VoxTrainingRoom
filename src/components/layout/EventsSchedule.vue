@@ -19,7 +19,6 @@
             .event__task
         .event__wrapper(
           v-for="(event) in currentDateEvents"
-          :class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}"
           :style="event.styles")
           .event__mover_up(
             @mousedown="resizeEvent($event, event)"
@@ -31,8 +30,8 @@
             :class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}")
             p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
             span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
-        .event__wrapper.default(
-          :style="currentEvent.styles")
+        .event__wrapper.default(:style="currentEvent.styles")
+          .event__task.default
 </template>
 
 <script lang="ts">
@@ -341,46 +340,12 @@
       font-size: 18px;
       color: var(--dark-blue-200);
       font-weight: 600;
-      width: 100%;
       z-index: 2;
       height: 100%;
+      position: absolute;
+      width: calc(100% - 80px);
+      margin-left: 80px;
       left: 0;
-
-      &.default,
-      &.design,
-      &.finance,
-      &.management {
-        cursor: pointer;
-        position: absolute;
-        width: calc(100% - 80px);
-        margin-left: 80px;
-
-        &:hover {
-          transition: background 0.3s ease;
-        }
-      }
-
-      &.default {
-        opacity: 0.15;
-        background: var(--grey-blue);
-        border-left: 4px solid var(--dark-blue-100);
-
-      }
-
-      &.finance {
-        background: rgba(133, 118, 237, 0.15);
-        border-left: 4px solid #8576ed;
-      }
-
-      &.design {
-        background: rgba(61, 131, 249, 0.15);
-        border-left: 4px solid #3d83f9;
-      }
-
-      &.management {
-        background: rgba(238, 165, 124, 0.15);
-        border-left: 4px solid #eea57c;
-      }
 
       p,
       span {
@@ -410,6 +375,38 @@
       flex-direction: column;
       justify-content: center;
 
+      &.default,
+      &.design,
+      &.finance,
+      &.management {
+        cursor: pointer;
+        &:hover {
+          transition: background 0.3s ease;
+        }
+      }
+
+      &.default {
+        opacity: 0.15;
+        background: var(--grey-blue);
+        border-left: 4px solid var(--dark-blue-100);
+
+      }
+
+      &.finance {
+        background: rgba(133, 118, 237, 0.15);
+        border-left: 4px solid #8576ed;
+      }
+
+      &.design {
+        background: rgba(61, 131, 249, 0.15);
+        border-left: 4px solid #3d83f9;
+      }
+
+      &.management {
+        background: rgba(238, 165, 124, 0.15);
+        border-left: 4px solid #eea57c;
+      }
+
       &.finance.hover:hover {
         background: rgba(133, 118, 237, 0.3);
       }
@@ -436,20 +433,24 @@
       &.hover {
         cursor: n-resize;
       }
+
+      &.hover:hover ~ .event__task {
+        transition: background 0.3s ease;
+      }
     }
 
     &__mover_up {
       top: -10px;
 
-      &.hover:hover ~ .event__task.finance {
+      &.hover:hover ~ .finance {
         background: linear-gradient(to bottom, rgba(133, 118, 237, 0.30) 30%, rgba(133, 118, 237, 0.15));
       }
 
-      &.hover:hover ~ .event__task.management {
+      &.hover:hover ~ .management {
         background: linear-gradient(to bottom, rgba(238, 165, 124, 0.30) 30%, rgba(238, 165, 124, 0.15));
       }
 
-      &.hover:hover ~ .event__task.design {
+      &.hover:hover ~ .design {
         background: linear-gradient(to bottom, rgba(61, 131, 249, 0.30) 30%, rgba(61, 131, 249, 0.15));
       }
     }
@@ -457,15 +458,15 @@
     &__mover_down {
       bottom: -10px;
 
-      &.hover:hover + .event__task.finance {
+      &.hover:hover + .finance {
         background: linear-gradient(to bottom, rgba(133, 118, 237, 0.15) 70%, rgba(133, 118, 237, 0.30));
       }
 
-      &.hover:hover + .event__task.management {
+      &.hover:hover + .management {
         background: linear-gradient(to bottom, rgba(238, 165, 124, 0.15) 70%, rgba(238, 165, 124, 0.30));
       }
 
-      &.hover:hover + .event__task.design {
+      &.hover:hover + .design {
         background: linear-gradient(to bottom, rgba(61, 131, 249, 0.15) 70%, rgba(61, 131, 249, 0.30));
       }
     }
