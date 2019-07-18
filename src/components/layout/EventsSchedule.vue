@@ -135,18 +135,12 @@
       let newTop = this.vectorHeight > 0 ? this.startingPoint : this.startingPoint - Math.abs(this.vectorHeight);
       let newHeight = this.vectorHeight > 0 ? this.vectorHeight : Math.abs(this.vectorHeight);
 
-      if (this.editing) {
-        newHeight = parseInt(this.currentEvent.styles.height, 10) + Math.abs(this.vectorHeight);
-      }
-
-      console.log(newTop, newHeight);
-
 
       const intersectingEvents = getIntersectingEvents(this.currentDateEvents,
         {top: newTop, height: newHeight}
       );
 
-      if (intersectingEvents && intersectingEvents.length) {
+      if (!this.editing && intersectingEvents && intersectingEvents.length) {
         this.closestIntersectingEventCoords = (this.closestIntersectingEventCoords || getClosestIntersectingEventCoords(intersectingEvents,
           {top: newTop, height: newHeight})) as EventStyles;
 
