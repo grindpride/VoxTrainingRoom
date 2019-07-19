@@ -6,12 +6,16 @@ export const createDefaultEvent = (): ScheduleEvent => ({
   startTime: '',
   endTime: '',
   type: '',
+  meta: {
+    vectorHeight: 0,
+    startingPoint: 0
+  },
   styles: {
     height: '0px',
-    display: 'none',
     top: '',
   }
 });
+
 const getMinutes = (height: number): string => {
   const minutes = Math.round((((100 * height) / 70) * 60) / 100);
   return minutes >= 10 ? `${minutes}` : `0${minutes}`;

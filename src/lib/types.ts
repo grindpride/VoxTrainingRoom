@@ -18,8 +18,12 @@ export interface SelectOption {
 
 export interface EventBlockStyles {
   height: string,
-  display?: string,
   top: string
+}
+
+export interface EventMeta {
+  startingPoint: number,
+  vectorHeight: number,
 }
 
 export interface ScheduleEvent {
@@ -29,7 +33,8 @@ export interface ScheduleEvent {
   startTime: string,
   endTime: string,
   type: string,
-  styles: EventBlockStyles
+  styles: EventBlockStyles,
+  meta: EventMeta,
 }
 
 export interface TimeSlotsCoords {

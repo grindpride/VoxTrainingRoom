@@ -24,13 +24,14 @@
             @mousedown="resizeEvent($event, event)"
             :class="{'hover': parseInt(currentEvent.styles.height) === 0.}")
           .event__mover_down(
+            @mousedown="resizeEvent($event, event)"
             :class="{'hover': parseInt(currentEvent.styles.height) === 0}")
           .event__task(
             @mousedown.left.stop="editEvent(event)"
             :class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}")
             p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
             span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
-        .event__wrapper.default(:style="currentEvent.styles")
+        .event__wrapper.default(:style="eventStyles")
           .event__task.default
 </template>
 
@@ -58,6 +59,9 @@
     @Mutation setEventStyles!: ({top, height}: { top: string, height: string }) => void;
     @Mutation setCurrentEvent!: (event: ScheduleEvent) => void;
 
+    @Mutation setStartingPoint!: (value: number) => void;
+    @Mutation setVectorHeight!: (value: number) => void;
+
     $refs!: {
       scheduleContainer: Element,
       slots: Element[]
@@ -71,11 +75,11 @@
     private paddingHeight: number = 0;
     private currentScrollTop: number = 0;
     private lastMousePoint: number = 0;
-    private currentEventTop: number = 0;
 
     private startingPoint: number = 0;
     private lastScrollTop: number = 0;
     private vectorHeight: number = 0;
+    private vectorHeightForEdit: number = 0;
 
     private closestIntersectingEventCoords: { top: number, height: number } | undefined;
 
@@ -131,18 +135,20 @@
       return coords;
     }
 
-    private changeEventStyles(): { top: string, height: string } {
-      let newTop = this.vectorHeight > 0 ? this.startingPoint : this.startingPoint - Math.abs(this.vectorHeight);
-      let newHeight = this.vectorHeight > 0 ? this.vectorHeight : Math.abs(this.vectorHeight);
+    private get eventStyles(): { top: string, height: string } {
+      let newTop = this.currentEvent.meta.vectorHeight > 0 ? this.currentEvent.meta.startingPoint
+        : this.currentEvent.meta.startingPoint - Math.abs(this.currentEvent.meta.vectorHeight);
 
+      let newHeight = this.currentEvent.meta.vectorHeight > 0 ? this.currentEvent.meta.vectorHeight
+        : Math.abs(this.currentEvent.meta.vectorHeight);
 
       const intersectingEvents = getIntersectingEvents(this.currentDateEvents,
         {top: newTop, height: newHeight}
       );
 
       if (!this.editing && intersectingEvents && intersectingEvents.length) {
-        this.closestIntersectingEventCoords = (this.closestIntersectingEventCoords || getClosestIntersectingEventCoords(intersectingEvents,
-          {top: newTop, height: newHeight})) as EventStyles;
+        this.closestIntersectingEventCoords = (this.closestIntersectingEventCoords ||
+          getClosestIntersectingEventCoords(intersectingEvents, {top: newTop, height: newHeight})) as EventStyles;
 
 
         if (newTop !== parseInt(this.currentEvent.styles.top, 10)) {
@@ -165,7 +171,7 @@
     }
 
     private resetCurrentEventStyles() {
-      const newStyles = this.changeEventStyles();
+      const newStyles = this.eventStyles;
 
       this.setEventStyles(newStyles);
     }
@@ -175,6 +181,10 @@
       const scrollDiff = this.currentScrollTop - this.lastScrollTop;
       if (this.isCreatingEvent) {
         this.vectorHeight = this.vectorHeight + scrollDiff;
+
+        const vectorHeight = this.currentEvent.meta.vectorHeight + scrollDiff;
+        this.setVectorHeight(vectorHeight);
+
         this.lastScrollTop = this.currentScrollTop;
 
         this.resetCurrentEventStyles();
@@ -191,7 +201,10 @@
         const currentMousePoint = e.pageY;
         const mouseDiff = currentMousePoint - this.lastMousePoint;
 
-        this.vectorHeight = this.vectorHeight + mouseDiff;
+        const vectorHeight = this.currentEvent.meta.vectorHeight + mouseDiff;
+
+        console.log(vectorHeight);
+        this.setVectorHeight(vectorHeight);
         this.lastMousePoint = currentMousePoint;
 
         this.resetCurrentEventStyles();
@@ -200,9 +213,7 @@
 
     private startEventSelection(e: MouseEvent) {
       this.lastMousePoint = e.pageY;
-      this.startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
       this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
-
 
       const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
 
@@ -212,11 +223,8 @@
 
       if (!this.isCreatingEvent) {
         this.isCreatingEvent = true;
-        this.currentEvent.styles.display = 'flex';
-        this.startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
-        this.currentEventTop = this.startingPoint;
-
-        this.currentEvent.styles.top = `${this.startingPoint}px`;
+        const startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
+        this.setStartingPoint(startingPoint);
       }
 
       return true;
@@ -232,9 +240,6 @@
         this.setTimeInterval({top, bottom});
 
         if (this.isCreatingEvent) {
-          this.vectorHeight = 0;
-          this.startingPoint = 0;
-
           this.$root.$emit('openmodal');
         }
       }
@@ -250,13 +255,8 @@
     }
 
     private resizeEvent(e: MouseEvent, event: ScheduleEvent) {
-      this.setCurrentEvent(event);
-      this.editing = true;
-
       this.lastMousePoint = e.pageY;
-      this.startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
       this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
-
 
       const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
 
@@ -264,15 +264,9 @@
         return false;
       }
 
-      if (!this.isCreatingEvent) {
-        this.isCreatingEvent = true;
-        this.currentEvent.styles.display = 'flex';
-        this.startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
-        this.currentEventTop = this.startingPoint;
+      this.setCurrentEvent(event);
 
-        this.currentEvent.styles.top = `${this.startingPoint}px`;
-      }
-
+      this.editing = true;
     }
 
   }

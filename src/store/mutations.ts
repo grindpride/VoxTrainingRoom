@@ -87,5 +87,13 @@ export const mutations: MutationTree<State> = {
       state.events[dateStr] = currentDateEvents
         .filter((ev: ScheduleEvent) => event.id !== ev.id)
     }
-  }
+  },
+
+  setVectorHeight(state, vectorHeight) {
+    state.currentEvent.meta.vectorHeight = vectorHeight;
+  },
+
+  setStartingPoint(state, startingPoint) {
+    state.currentEvent.meta.startingPoint = startingPoint;
+  },
 };
