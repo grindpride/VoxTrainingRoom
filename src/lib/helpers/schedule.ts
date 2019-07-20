@@ -102,10 +102,10 @@ export const hasCoordsIntersect = (coords1: EventStyles, coords2: EventStyles): 
     (coords1.top < coords2Bottom && coords1Bottom > coords2Bottom))
 };
 
-export const getIntersectingEvents = (events: ScheduleEvent[], {top: eventTop, height: eventHeight}: EventStyles): ScheduleEvent[] | undefined => {
+export const getIntersectingEvents = (events: ScheduleEvent[], {top: eventTop, height: eventHeight, id: eventId}: EventStyles & { id: number }): ScheduleEvent[] | undefined => {
   if (events && events.length) {
     return events
-      .filter(({styles}) => hasCoordsIntersect({top: eventTop, height: eventHeight}, {
+      .filter(({styles, id}) => id !== eventId && hasCoordsIntersect({top: eventTop, height: eventHeight}, {
         top: parseInt(styles.top, 10),
         height: parseInt(styles.height, 10)
       }))
@@ -114,11 +114,11 @@ export const getIntersectingEvents = (events: ScheduleEvent[], {top: eventTop, h
   return undefined;
 };
 
-export const getClosestIntersectingEventCoords = (events: ScheduleEvent[], {top, height}: EventStyles): EventStyles | undefined => {
-  if (events && events.length && event) {
+export const getClosestIntersectingEventCoords = (events: ScheduleEvent[], {top, height, id}: EventStyles & {id: number}): EventStyles | undefined => {
+  if (events && events.length) {
     const bottom = top + height;
 
-    const closestEvent = events.reduce((prev, curr) => {
+    const closestEvent = events.filter(ev => ev.id !== id).reduce((prev, curr) => {
       const prevTop = parseInt(prev.styles.top, 10);
       const currTop = parseInt(curr.styles.top, 10);
 

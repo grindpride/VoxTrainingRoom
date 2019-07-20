@@ -165,10 +165,10 @@
       }
 
       const intersectingEvents = getIntersectingEvents(this.currentDateEvents,
-        {top: newTop, height: newHeight}
+        {top: newTop, height: newHeight, id: this.currentEvent.id}
       );
 
-      if (!this.resizing && intersectingEvents && intersectingEvents.length) {
+      if (intersectingEvents && intersectingEvents.length) {
         this.closestIntersectingEventCoords = (this.closestIntersectingEventCoords ||
           getClosestIntersectingEventCoords(intersectingEvents, {top: newTop, height: newHeight})) as EventStyles;
 
