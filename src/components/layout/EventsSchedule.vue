@@ -242,7 +242,6 @@
       if (!this.isCreatingEvent) {
         this.isCreatingEvent = true;
         const startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
-        console.log('СУУУУУУУУУКА')
         this.setStartingPoint(startingPoint);
       }
 
