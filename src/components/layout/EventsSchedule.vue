@@ -145,14 +145,19 @@
 
         newHeight = Math.abs(this.currentEvent.meta.vectorHeight);
       } else {
+        const eventTop = parseInt(this.currentEvent.styles.top, 10);
+
         if (this.resizing === ResizingType.Top) {
-          newTop = this.currentEvent.meta.vectorHeight > 0 ? parseInt(this.currentEvent.styles.top) + this.vectorHeight
+          newTop = this.currentEvent.meta.vectorHeight > 0
+            ? eventTop + this.vectorHeight
             : this.currentEvent.meta.startingPoint;
 
           newHeight = Math.abs(this.currentEvent.meta.vectorHeight)
+
         } else if (this.resizing === ResizingType.Bottom) {
-          newTop = this.currentEvent.meta.vectorHeight > 0 ? this.currentEvent.meta.startingPoint :
-            parseInt(this.currentEvent.styles.top) + this.vectorHeight;
+          newTop = this.currentEvent.meta.vectorHeight > 0
+            ? this.currentEvent.meta.startingPoint
+            : eventTop + this.vectorHeight;
 
           newHeight = Math.abs(this.currentEvent.meta.vectorHeight)
         }
