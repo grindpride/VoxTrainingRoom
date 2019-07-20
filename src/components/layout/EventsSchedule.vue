@@ -21,7 +21,7 @@
           v-for="(event) in currentDateEvents"
           :style="event.styles")
           .event__mover_up(
-            @mousedown="resizeEvent($event, event)"
+            @mousedown.stop="resizeEvent($event, event)"
             :class="{'hover': parseInt(currentEvent.styles.height) === 0.}")
           .event__mover_down(
             @mousedown="resizeEvent($event, event)"
@@ -136,11 +136,23 @@
     }
 
     private get eventStyles(): { top: string, height: string } {
-      let newTop = this.currentEvent.meta.vectorHeight > 0 ? this.currentEvent.meta.startingPoint
-        : this.currentEvent.meta.startingPoint - Math.abs(this.currentEvent.meta.vectorHeight);
+      let newTop = 0;
+      let newHeight = 0;
 
-      let newHeight = this.currentEvent.meta.vectorHeight > 0 ? this.currentEvent.meta.vectorHeight
-        : Math.abs(this.currentEvent.meta.vectorHeight);
+      if (!this.editing) {
+        newTop = this.currentEvent.meta.vectorHeight > 0 ? this.currentEvent.meta.startingPoint
+          : this.currentEvent.meta.startingPoint - Math.abs(this.currentEvent.meta.vectorHeight);
+
+        newHeight = Math.abs(this.currentEvent.meta.vectorHeight);
+      } else {
+
+
+        newTop = this.currentEvent.meta.vectorHeight > 0 ? parseInt(this.currentEvent.styles.top) + this.vectorHeight
+          : this.currentEvent.meta.startingPoint;
+
+        console.log(this.currentEvent.meta.startingPoint);
+        newHeight = Math.abs(this.currentEvent.meta.vectorHeight)
+      }
 
       const intersectingEvents = getIntersectingEvents(this.currentDateEvents,
         {top: newTop, height: newHeight}
@@ -180,7 +192,7 @@
       this.currentScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
       const scrollDiff = this.currentScrollTop - this.lastScrollTop;
       if (this.isCreatingEvent) {
-        this.vectorHeight = this.vectorHeight + scrollDiff;
+        // this.vectorHeight = this.vectorHeight + scrollDiff;
 
         const vectorHeight = this.currentEvent.meta.vectorHeight + scrollDiff;
         this.setVectorHeight(vectorHeight);
@@ -201,10 +213,16 @@
         const currentMousePoint = e.pageY;
         const mouseDiff = currentMousePoint - this.lastMousePoint;
 
-        const vectorHeight = this.currentEvent.meta.vectorHeight + mouseDiff;
+        if (!this.editing) {
+          const vectorHeight = this.currentEvent.meta.vectorHeight + mouseDiff;
 
-        console.log(vectorHeight);
-        this.setVectorHeight(vectorHeight);
+          this.setVectorHeight(vectorHeight);
+        } else {
+          this.vectorHeight = mouseDiff;
+          const newVH = this.currentEvent.meta.vectorHeight - mouseDiff;
+          this.setVectorHeight(newVH);
+        }
+
         this.lastMousePoint = currentMousePoint;
 
         this.resetCurrentEventStyles();
@@ -224,6 +242,7 @@
       if (!this.isCreatingEvent) {
         this.isCreatingEvent = true;
         const startingPoint = e.pageY - this.containerTop + this.currentScrollTop;
+        console.log('СУУУУУУУУУКА')
         this.setStartingPoint(startingPoint);
       }
 
@@ -240,6 +259,7 @@
         this.setTimeInterval({top, bottom});
 
         if (this.isCreatingEvent) {
+          this.vectorHeight = 0;
           this.$root.$emit('openmodal');
         }
       }
@@ -255,8 +275,11 @@
     }
 
     private resizeEvent(e: MouseEvent, event: ScheduleEvent) {
+      this.editing = true;
+
       this.lastMousePoint = e.pageY;
       this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
+      this.isCreatingEvent = true;
 
       const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
 
@@ -264,9 +287,15 @@
         return false;
       }
 
+
+
+
       this.setCurrentEvent(event);
 
-      this.editing = true;
+      const startingPoint = parseInt(this.currentEvent.styles.top, 10) + parseInt(this.currentEvent.styles.height, 10);
+
+      // console.log({startingPoint, y: e.pageY, top: parseInt(this.currentEvent.styles.top), height: parseInt(this.currentEvent.styles.height)});
+      this.setStartingPoint(startingPoint);
     }
 
   }
