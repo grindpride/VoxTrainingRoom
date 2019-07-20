@@ -44,6 +44,7 @@
   import {getClosestIntersectingEventCoords, getIntersectingEvents} from "@/lib/helpers/schedule";
   import {range} from "@/lib/helpers/common";
   import {nineAMTopPosition} from "@/lib/consts";
+  import {ResizingType} from '@/lib/enums';
 
   @Component({
     components: {SvgIcon}
