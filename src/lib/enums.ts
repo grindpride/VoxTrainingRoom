@@ -1,21 +1,21 @@
-export enum MonthTypes {
+export const enum MonthTypes {
   Prev = 'prev',
   Current = 'current',
   Next = 'next'
 }
 
-export enum ButtonTypes {
+export const enum ButtonTypes {
   Submit = 'submit',
   Default = 'default',
   Delete = 'delete'
 }
 
-export enum InputType {
+export const enum InputType {
   input = 'input',
   textarea = 'textarea'
 }
 
-const enum ResizingType {
+export const enum ResizingType {
   Top = 'top',
   Bottom = 'bottom'
 }
