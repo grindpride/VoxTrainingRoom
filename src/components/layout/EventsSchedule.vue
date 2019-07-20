@@ -161,16 +161,19 @@
 
           newHeight = Math.abs(this.currentEvent.meta.vectorHeight)
         }
-
       }
 
       const intersectingEvents = getIntersectingEvents(this.currentDateEvents,
-        {top: newTop, height: newHeight, id: this.currentEvent.id}
+        {top: newTop, height: newHeight, id: <number>this.currentEvent.id}
       );
 
       if (intersectingEvents && intersectingEvents.length) {
         this.closestIntersectingEventCoords = (this.closestIntersectingEventCoords ||
-          getClosestIntersectingEventCoords(intersectingEvents, {top: newTop, height: newHeight})) as EventStyles;
+          getClosestIntersectingEventCoords(intersectingEvents, {
+            top: newTop,
+            height: newHeight,
+            id: <number>this.currentEvent.id
+          })) as EventStyles & { id: number };
 
 
         if (newTop !== parseInt(this.currentEvent.styles.top, 10)) {
