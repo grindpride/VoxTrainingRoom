@@ -14,3 +14,8 @@ export enum InputType {
   input = 'input',
   textarea = 'textarea'
 }
+
+const enum ResizingType {
+  Top = 'top',
+  Bottom = 'bottom'
+}

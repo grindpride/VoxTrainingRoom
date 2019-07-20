@@ -21,18 +21,18 @@
           v-for="(event) in currentDateEvents"
           :style="event.styles")
           .event__mover_up(
-            @mousedown.stop="resizeEvent($event, event)"
+            @mousedown.stop="resizeEvent($event, 'top', event)"
             :class="{'hover': parseInt(currentEvent.styles.height) === 0.}")
           .event__mover_down(
-            @mousedown="resizeEvent($event, event)"
+            @mousedown.stop="resizeEvent($event, 'bottom', event)"
             :class="{'hover': parseInt(currentEvent.styles.height) === 0}")
           .event__task(
             @mousedown.left.stop="editEvent(event)"
             :class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}")
             p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
             span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
-        .event__wrapper.default(:style="eventStyles")
-          .event__task.default
+        .event__wrapper(:style="eventStyles")
+          .event__task(:class="currentEvent.type ? currentEvent.type.toLowerCase() : 'default'")
 </template>
 
 <script lang="ts">
@@ -79,9 +79,10 @@
     private startingPoint: number = 0;
     private lastScrollTop: number = 0;
     private vectorHeight: number = 0;
-    private vectorHeightForEdit: number = 0;
 
     private closestIntersectingEventCoords: { top: number, height: number } | undefined;
+
+    private resizing: ResizingType | false;
 
     private hours: string[] = range(0, 23).map(n => `${n >= 10 ? n : `0${n}`}:00`);
 
@@ -103,8 +104,6 @@
 
       const timeSlotsCoords = this.getTimeSlotsCoords();
       this.setTimeSlotCoords(timeSlotsCoords);
-
-      this.startingPoint = 0;
 
       (<HTMLElement>this.scheduleContainer).scrollTo(0, nineAMTopPosition);
 
@@ -139,26 +138,31 @@
       let newTop = 0;
       let newHeight = 0;
 
-      if (!this.editing) {
+      if (!this.resizing) {
         newTop = this.currentEvent.meta.vectorHeight > 0 ? this.currentEvent.meta.startingPoint
           : this.currentEvent.meta.startingPoint - Math.abs(this.currentEvent.meta.vectorHeight);
 
         newHeight = Math.abs(this.currentEvent.meta.vectorHeight);
       } else {
+        if (this.resizing === ResizingType.Top) {
+          newTop = this.currentEvent.meta.vectorHeight > 0 ? parseInt(this.currentEvent.styles.top) + this.vectorHeight
+            : this.currentEvent.meta.startingPoint;
 
+          newHeight = Math.abs(this.currentEvent.meta.vectorHeight)
+        } else if (this.resizing === ResizingType.Bottom) {
+          newTop = this.currentEvent.meta.vectorHeight > 0 ? this.currentEvent.meta.startingPoint :
+            parseInt(this.currentEvent.styles.top) + this.vectorHeight;
 
-        newTop = this.currentEvent.meta.vectorHeight > 0 ? parseInt(this.currentEvent.styles.top) + this.vectorHeight
-          : this.currentEvent.meta.startingPoint;
+          newHeight = Math.abs(this.currentEvent.meta.vectorHeight)
+        }
 
-        console.log(this.currentEvent.meta.startingPoint);
-        newHeight = Math.abs(this.currentEvent.meta.vectorHeight)
       }
 
       const intersectingEvents = getIntersectingEvents(this.currentDateEvents,
         {top: newTop, height: newHeight}
       );
 
-      if (!this.editing && intersectingEvents && intersectingEvents.length) {
+      if (!this.resizing && intersectingEvents && intersectingEvents.length) {
         this.closestIntersectingEventCoords = (this.closestIntersectingEventCoords ||
           getClosestIntersectingEventCoords(intersectingEvents, {top: newTop, height: newHeight})) as EventStyles;
 
@@ -192,10 +196,18 @@
       this.currentScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
       const scrollDiff = this.currentScrollTop - this.lastScrollTop;
       if (this.isCreatingEvent) {
-        // this.vectorHeight = this.vectorHeight + scrollDiff;
 
-        const vectorHeight = this.currentEvent.meta.vectorHeight + scrollDiff;
-        this.setVectorHeight(vectorHeight);
+        if (!this.resizing) {
+          const vectorHeight = this.currentEvent.meta.vectorHeight + scrollDiff;
+
+          this.setVectorHeight(vectorHeight);
+        } else {
+          this.vectorHeight = scrollDiff;
+
+          const newVH = this.currentEvent.meta.vectorHeight - (this.resizing === ResizingType.Top ? scrollDiff : -scrollDiff);
+
+          this.setVectorHeight(newVH);
+        }
 
         this.lastScrollTop = this.currentScrollTop;
 
@@ -213,13 +225,15 @@
         const currentMousePoint = e.pageY;
         const mouseDiff = currentMousePoint - this.lastMousePoint;
 
-        if (!this.editing) {
+        if (!this.resizing) {
           const vectorHeight = this.currentEvent.meta.vectorHeight + mouseDiff;
 
           this.setVectorHeight(vectorHeight);
         } else {
           this.vectorHeight = mouseDiff;
-          const newVH = this.currentEvent.meta.vectorHeight - mouseDiff;
+
+          const newVH = this.currentEvent.meta.vectorHeight - (this.resizing === ResizingType.Top ? mouseDiff : -mouseDiff);
+
           this.setVectorHeight(newVH);
         }
 
@@ -259,6 +273,12 @@
 
         if (this.isCreatingEvent) {
           this.vectorHeight = 0;
+
+          if (this.resizing) {
+            this.setVectorHeight(Math.abs(this.currentEvent.meta.vectorHeight));
+            this.resizing = false;
+          }
+
           this.$root.$emit('openmodal');
         }
       }
@@ -273,27 +293,20 @@
       this.$root.$emit('openmodal');
     }
 
-    private resizeEvent(e: MouseEvent, event: ScheduleEvent) {
-      this.editing = true;
+    private resizeEvent(e: MouseEvent, resizingFrom: ResizingType, event: ScheduleEvent) {
+      this.resizing = resizingFrom;
 
       this.lastMousePoint = e.pageY;
       this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
       this.isCreatingEvent = true;
 
-      const withinPadding: boolean = e.pageY - this.containerTop <= this.paddingHeight;
-
-      if (withinPadding) {
-        return false;
-      }
-
-
-
-
       this.setCurrentEvent(event);
 
-      const startingPoint = parseInt(this.currentEvent.styles.top, 10) + parseInt(this.currentEvent.styles.height, 10);
+      const startingPoint = this.resizing === ResizingType.Top
+        ? parseInt(this.currentEvent.styles.top, 10) + parseInt(this.currentEvent.styles.height, 10)
+        : parseInt(this.currentEvent.styles.top);
 
-      // console.log({startingPoint, y: e.pageY, top: parseInt(this.currentEvent.styles.top), height: parseInt(this.currentEvent.styles.height)});
+
       this.setStartingPoint(startingPoint);
     }
 
