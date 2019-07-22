@@ -296,7 +296,7 @@
     }
 
     private editEvent(event: ScheduleEvent) {
-      this.setCurrentEvent(event);
+      this.setCurrentEvent({...event});
 
       this.$root.$emit('openmodal');
     }
@@ -309,7 +309,7 @@
       this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
       this.isCreatingEvent = true;
 
-      this.setCurrentEvent(event);
+      this.setCurrentEvent({...event});
 
       const startingPoint = this.resizing === ResizingType.Top
         ? parseInt(this.currentEvent.styles.top, 10) + parseInt(this.currentEvent.styles.height, 10)
