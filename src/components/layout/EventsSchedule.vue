@@ -272,17 +272,15 @@
     }
 
     private stopEventSelection() {
-      const height: number = parseInt(this.currentEvent.styles.height, 10);
+      const height: number = parseInt(this.eventStyles.height, 10);
 
       if (height) {
-        const top: number = parseInt(this.currentEvent.styles.top, 10);
+        const top: number = parseInt(this.eventStyles.top, 10);
         const bottom: number = top + height;
 
         this.setTimeInterval({top, bottom});
 
         if (this.isCreatingEvent) {
-          this.vectorHeight = 0;
-
           if (this.resizing) {
             this.setVectorHeight(Math.abs(this.currentEvent.meta.vectorHeight));
             this.resizing = false;
@@ -304,6 +302,7 @@
 
     private resizeEvent(e: MouseEvent, resizingFrom: ResizingType, event: ScheduleEvent) {
       this.resizing = resizingFrom;
+      this.vectorHeight = 0;
 
       this.lastMousePoint = e.pageY;
       this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
