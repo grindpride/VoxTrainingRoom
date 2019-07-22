@@ -31,7 +31,7 @@
             :class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}")
             p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
             span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
-        .event__wrapper(:style="eventStyles")
+        .event__wrapper(:style="currentEvent.styles")
           .event__task(:class="currentEvent.type ? currentEvent.type.toLowerCase() : 'default'")
 </template>
 
@@ -135,7 +135,7 @@
       return coords;
     }
 
-    private get eventStyles(): { top: string, height: string } {
+    private getEventStyles(): { top: string, height: string } {
       let newTop = 0;
       let newHeight = 0;
 
@@ -181,7 +181,7 @@
             - (this.closestIntersectingEventCoords.top + this.closestIntersectingEventCoords.height));
 
           newTop += topOffset;
-          newHeight = this.startingPoint - newTop;
+          newHeight = this.resizing ? parseInt(this.currentEvent.styles.height) : this.startingPoint - newTop
 
         } else {
           const heightOffset = (newTop + newHeight) - this.closestIntersectingEventCoords.top;
@@ -196,7 +196,7 @@
     }
 
     private resetCurrentEventStyles() {
-      const newStyles = this.eventStyles;
+      const newStyles = this.getEventStyles();
 
       this.setEventStyles(newStyles);
     }
@@ -253,6 +253,7 @@
     }
 
     private startEventSelection(e: MouseEvent) {
+      this.vectorHeight = 0;
       this.lastMousePoint = e.pageY;
       this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
 
@@ -272,19 +273,20 @@
     }
 
     private stopEventSelection() {
-      const height: number = parseInt(this.eventStyles.height, 10);
+      const height: number = parseInt(this.currentEvent.styles.height, 10);
 
       if (height) {
-        const top: number = parseInt(this.eventStyles.top, 10);
+        const top: number = parseInt(this.currentEvent.styles.top, 10);
         const bottom: number = top + height;
 
         this.setTimeInterval({top, bottom});
 
         if (this.isCreatingEvent) {
           if (this.resizing) {
-            this.setVectorHeight(Math.abs(this.currentEvent.meta.vectorHeight));
             this.resizing = false;
           }
+
+          this.setVectorHeight(Math.abs(this.currentEvent.meta.vectorHeight));
 
           this.$root.$emit('openmodal');
         }
@@ -309,6 +311,8 @@
       this.isCreatingEvent = true;
 
       this.setCurrentEvent(event);
+
+      console.log(this.currentEvent.styles.height, this.currentEvent.styles.top, this.currentEvent.meta.vectorHeight)
 
       const startingPoint = this.resizing === ResizingType.Top
         ? parseInt(this.currentEvent.styles.top, 10) + parseInt(this.currentEvent.styles.height, 10)
