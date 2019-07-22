@@ -181,8 +181,7 @@
             - (this.closestIntersectingEventCoords.top + this.closestIntersectingEventCoords.height));
 
           newTop += topOffset;
-          newHeight = this.resizing ? parseInt(this.currentEvent.styles.height) : this.startingPoint - newTop
-
+          newHeight =  this.currentEvent.meta.startingPoint - newTop;
         } else {
           const heightOffset = (newTop + newHeight) - this.closestIntersectingEventCoords.top;
           newHeight -= heightOffset
@@ -311,8 +310,6 @@
       this.isCreatingEvent = true;
 
       this.setCurrentEvent(event);
-
-      console.log(this.currentEvent.styles.height, this.currentEvent.styles.top, this.currentEvent.meta.vectorHeight)
 
       const startingPoint = this.resizing === ResizingType.Top
         ? parseInt(this.currentEvent.styles.top, 10) + parseInt(this.currentEvent.styles.height, 10)
