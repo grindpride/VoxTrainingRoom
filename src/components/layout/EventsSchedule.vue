@@ -60,6 +60,8 @@ import {ResizingType} from "../../lib/enums";
     @Mutation setTimeSlotCoords!: (timeSlotCoords: TimeSlotsCoords[]) => void;
     @Mutation setEventStyles!: ({top, height}: { top: string, height: string }) => void;
     @Mutation setCurrentEvent!: (event: ScheduleEvent) => void;
+    @Mutation('editEvent') editExistingEvent: (event: ScheduleEvent) => void;
+    @Mutation resetEvent!: () => void;
 
     @Mutation setStartingPoint!: (value: number) => void;
     @Mutation setVectorHeight!: (value: number) => void;
@@ -255,10 +257,16 @@ import {ResizingType} from "../../lib/enums";
         this.setTimeInterval({top, bottom});
 
         if (this.isCreatingEvent) {
-          this.resizing = false;
           this.setVectorHeight(this.currentEvent.meta.vectorHeight);
 
-          this.$root.$emit('openmodal');
+          if (!this.resizing) {
+            this.$root.$emit('openmodal');
+          } else {
+            this.editExistingEvent(this.currentEvent);
+            this.resetEvent()
+
+            this.resizing = false;
+          }
         }
       }
 

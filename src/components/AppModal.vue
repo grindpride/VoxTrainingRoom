@@ -101,10 +101,6 @@
     private eventNameValidators = eventNameValidators;
     private timeValidators = timeValidators;
 
-    private get currentEvent() {
-      return this.currentEvent
-    }
-
     private get timeError(): string {
       if (checkIfEventsIntersectByTime(this.currentDateEvents, this.currentEvent)) {
         return 'Events intersect. Change time';
