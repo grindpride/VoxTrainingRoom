@@ -97,9 +97,9 @@ export const hasCoordsIntersect = (coords1: EventStyles, coords2: EventStyles): 
   const coords2Bottom = coords2.top + coords2.height;
 
 
-  return ((coords1.top > coords2.top && coords1.top < coords2Bottom) ||
-    (coords1Bottom > coords2.top && coords1.top < coords2.top) ||
-    (coords1.top < coords2Bottom && coords1Bottom > coords2Bottom))
+  return ((coords1.top >= coords2.top && coords1.top <= coords2Bottom) ||
+    (coords1Bottom >= coords2.top && coords1.top <= coords2.top) ||
+    (coords1.top <= coords2Bottom && coords1Bottom >= coords2Bottom))
 };
 
 export const getIntersectingEvents = (events: ScheduleEvent[], {top: eventTop, height: eventHeight, id: eventId}: EventStyles & { id: number }): ScheduleEvent[] | undefined => {

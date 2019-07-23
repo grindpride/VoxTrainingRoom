@@ -244,7 +244,8 @@ import {ResizingType} from "../../lib/enums";
         this.setTimeInterval({top, bottom});
 
         if (this.isCreatingEvent) {
-          this.setVectorHeight(this.currentEvent.meta.vectorHeight);
+          const height = parseInt(this.currentEvent.styles.height, 10);
+          this.setVectorHeight(this.currentEvent.meta.vectorHeight > 0 ? height : -height);
 
           if (!this.resizing) {
             this.$root.$emit('openmodal');
