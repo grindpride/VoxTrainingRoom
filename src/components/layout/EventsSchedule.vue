@@ -23,13 +23,15 @@ import {ResizingType} from "../../lib/enums";
           :style="event.styles")
           .event__mover_up(
             @mousedown.stop="resizeEvent($event, 'top', event)"
-            :class="{'hover': parseInt(currentEvent.styles.height) === 0.}")
+            :class="{'hoverEnabled': parseInt(currentEvent.styles.height) === 0}")
+
           .event__mover_down(
             @mousedown.stop="resizeEvent($event, 'bottom', event)"
-            :class="{'hover': parseInt(currentEvent.styles.height) === 0}")
+            :class="{'hoverEnabled': parseInt(currentEvent.styles.height) === 0}")
+
           .event__task(
             @mousedown.left.stop="editEvent(event)"
-            :class="{[event.type.toLowerCase()]: true, 'hover': parseInt(currentEvent.styles.height) === 0}")
+            :class="{[event.type.toLowerCase()]: true, 'hoverEnabled': parseInt(currentEvent.styles.height) === 0}")
             p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
             span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
         .event__wrapper(:style="currentEvent.styles")
@@ -264,7 +266,7 @@ import {ResizingType} from "../../lib/enums";
     private editEvent(event: ScheduleEvent) {
       this.setCurrentEvent({...event});
 
-      this.$root.$emit('openmodal');
+      // this.$root.$emit('openmodal');
     }
 
     private resizeEvent(e: MouseEvent, resizingFrom: ResizingType, event: ScheduleEvent) {
@@ -411,16 +413,13 @@ import {ResizingType} from "../../lib/enums";
       display: flex;
       flex-direction: column;
       justify-content: center;
+      transition: background 0.3s ease;
 
       &.default,
       &.design,
       &.finance,
       &.management {
         cursor: pointer;
-
-        &:hover {
-          transition: background 0.3s ease;
-        }
       }
 
       &.default {
@@ -445,17 +444,17 @@ import {ResizingType} from "../../lib/enums";
         border-left: 4px solid #eea57c;
       }
 
-      &.finance.hover:hover {
+      &.finance.hoverEnabled:hover {
         background: rgba(133, 118, 237, 0.3);
       }
 
 
-      &.design.hover:hover {
+      &.design.hoverEnabled:hover {
         background: rgba(61, 131, 249, 0.3);
       }
 
 
-      &.management.hover:hover {
+      &.management.hoverEnabled:hover {
         background: rgba(238, 165, 124, 0.3);
       }
     }
@@ -468,43 +467,39 @@ import {ResizingType} from "../../lib/enums";
       left: -4px;
       position: absolute;
 
-      &.hover {
+      &.hoverEnabled {
         cursor: n-resize;
-      }
-
-      &.hover:hover ~ .event__task {
-        transition: background 0.3s ease;
       }
     }
 
     &__mover_up {
       top: -10px;
 
-      &.hover:hover ~ .finance {
-        background: linear-gradient(to bottom, rgba(133, 118, 237, 0.30) 30%, rgba(133, 118, 237, 0.15));
+      &.hoverEnabled:hover ~ .finance {
+        background: linear-gradient(to top, rgba(133, 118, 237, 0.15) 70%, rgba(133, 118, 237, 0.30));
       }
 
-      &.hover:hover ~ .management {
-        background: linear-gradient(to bottom, rgba(238, 165, 124, 0.30) 30%, rgba(238, 165, 124, 0.15));
+      &.hoverEnabled:hover ~ .management {
+        background: linear-gradient(to top, rgba(238, 165, 124, 0.15) 70%, rgba(238, 165, 124, 1));
       }
 
-      &.hover:hover ~ .design {
-        background: linear-gradient(to bottom, rgba(61, 131, 249, 0.30) 30%, rgba(61, 131, 249, 0.15));
+      &.hoverEnabled:hover ~ .design {
+        background: linear-gradient(to top, rgba(61, 131, 249, 0.15) 70%, rgba(61, 131, 249, 0.30));
       }
     }
 
     &__mover_down {
       bottom: -10px;
 
-      &.hover:hover + .finance {
+      &.hoverEnabled:hover + .finance {
         background: linear-gradient(to bottom, rgba(133, 118, 237, 0.15) 70%, rgba(133, 118, 237, 0.30));
       }
 
-      &.hover:hover + .management {
+      &.hoverEnabled:hover + .management {
         background: linear-gradient(to bottom, rgba(238, 165, 124, 0.15) 70%, rgba(238, 165, 124, 0.30));
       }
 
-      &.hover:hover + .design {
+      &.hoverEnabled:hover + .design {
         background: linear-gradient(to bottom, rgba(61, 131, 249, 0.15) 70%, rgba(61, 131, 249, 0.30));
       }
     }
