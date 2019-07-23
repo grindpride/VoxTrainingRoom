@@ -13,7 +13,8 @@ export const createDefaultEvent = (): ScheduleEvent => ({
   styles: {
     height: '0px',
     top: '',
-  }
+  },
+  isResizing: false
 });
 
 const getMinutes = (height: number): string => {

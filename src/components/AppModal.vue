@@ -13,7 +13,7 @@
             name="eventName"
             :validators="eventNameValidators"
             @error="setError"
-            v-model="currentEvent.name")
+            v-model="scheduleEvent.name")
         .form-group
           AppInput(
             placeholder="09:00"
@@ -23,7 +23,7 @@
             name="startTime"
             @error="setError"
             :validators="timeValidators"
-            v-model="currentEvent.startTime")
+            v-model="scheduleEvent.startTime")
           .hyphen__wrapper
             .hyphen
           AppInput(
@@ -35,11 +35,11 @@
             mask="##:##"
             :validators="timeValidators"
             :parentError="timeError"
-            v-model="currentEvent.endTime")
+            v-model="scheduleEvent.endTime")
         .form-group
           AppSelect(
             :options="eventTypes"
-            v-model="currentEvent.type"
+            v-model="scheduleEvent.type"
             label="Event type")
         .form-group
           AppInput(
@@ -47,7 +47,7 @@
             label="Event"
             type="textarea"
             name="eventDesc"
-            v-model="currentEvent.desc")
+            v-model="scheduleEvent.desc")
       .modal__footer
         Button(:label="hasCurrentEventExist ? 'Edit' : 'Save'" type="submit" @click="saveEvent" :disabled="hasError")
         Button(label="Cancel" @click="close")
@@ -64,26 +64,28 @@
   import Button from '@/components/ui/Button.vue';
   import AppSelect from "@/components/ui/AppSelect.vue";
 
-  import {EventTimeInterval, ScheduleEvent} from "@/lib/types";
+  import {EventCoords, EventTimeInterval, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
   import {eventNameValidators, timeValidators} from "@/lib/validators";
-  import {checkIfEndTimeBigger, checkIfEventsIntersectByTime} from "@/lib/helpers/schedule";
+  import {checkIfEndTimeBigger, checkIfEventsIntersectByTime, getCoordsByTime} from "@/lib/helpers/schedule";
 
   @Component({
     components: {SvgIcon, AppInput, Button, AppSelect}
   })
   export default class AppModal extends Vue {
-    @State currentEvent: ScheduleEvent;
+    @State timeSlotsCoords: TimeSlotsCoords[];
 
     @Getter currentDateEvents: ScheduleEvent[];
-    @Getter hasCurrentEventExist: boolean;
 
     @Mutation resetEvent!: () => void;
     @Mutation addEvent!: (event: ScheduleEvent) => void;
     @Mutation editEvent: (event: ScheduleEvent) => void;
     @Mutation deleteEvent: (event: ScheduleEvent) => void;
-    @Mutation setCoords!: ({startTime, endTime}: EventTimeInterval) => void;
+
+    private hasCurrentEventExist: boolean = false;
 
     private errors: { [key: string]: string } = {};
+
+    private scheduleEvent: ScheduleEvent;
 
     private get hasError(): boolean {
       const error = Object.keys(this.errors).some(k => this.errors[k]) || !!this.timeError;
@@ -102,11 +104,11 @@
     private timeValidators = timeValidators;
 
     private get timeError(): string {
-      if (checkIfEventsIntersectByTime(this.currentDateEvents, this.currentEvent)) {
+      if (checkIfEventsIntersectByTime(this.currentDateEvents, this.scheduleEvent)) {
         return 'Events intersect. Change time';
       }
 
-      if (!checkIfEndTimeBigger(this.currentEvent.startTime, this.currentEvent.endTime)) {
+      if (!checkIfEndTimeBigger(this.scheduleEvent.startTime, this.scheduleEvent.endTime)) {
         return "Start time can't be bigger then end time";
       }
 
@@ -127,22 +129,29 @@
 
     private handleKeyPress(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        this.close();// Ну или что там у тебя.
+        this.close();
       }
     }
 
     deleteCurrentEvent(): void {
-      this.deleteEvent(this.currentEvent);
-
+      this.deleteEvent(this.scheduleEvent);
       this.close();
     }
 
-    close(): void {
+    resetCurrentEvent() {
+      this.$root.$emit('event:reset');
       this.resetEvent();
+    }
+
+    close(): void {
+      this.resetCurrentEvent();
       this.isOpen = false;
     }
 
-    open(): void {
+    open(ev: ScheduleEvent): void {
+      this.scheduleEvent = {...ev} as ScheduleEvent;
+      this.hasCurrentEventExist = this.scheduleEvent && this.scheduleEvent.id >= 0;
+
       this.isOpen = true;
     }
 
@@ -158,17 +167,30 @@
       }
     }
 
+    setCoords() {
+      const {startTime, endTime} : EventTimeInterval = this.scheduleEvent;
+
+      const {top, bottom}: EventCoords = getCoordsByTime(<TimeSlotsCoords[]>(this.timeSlotsCoords), {
+        startTime,
+        endTime
+      });
+
+      this.scheduleEvent.styles.top = `${top}px`;
+      this.scheduleEvent.styles.height = `${bottom - top}px`;
+      this.scheduleEvent.meta.vectorHeight = bottom - top;
+    }
+
     saveEvent(): void {
       if (!this.hasError) {
-        this.setCoords({startTime: this.currentEvent.startTime, endTime: this.currentEvent.endTime});
+        this.setCoords();
 
         if (this.hasCurrentEventExist) {
-          this.editEvent(this.currentEvent);
+          this.editEvent(this.scheduleEvent);
         } else {
-          this.addEvent(this.currentEvent);
+          this.addEvent(this.scheduleEvent);
         }
 
-        this.resetEvent();
+        this.resetCurrentEvent();
 
         this.close();
       }

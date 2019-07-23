@@ -35,6 +35,7 @@ export interface ScheduleEvent {
   type: string,
   styles: EventBlockStyles,
   meta: EventMeta,
+  isResizing: boolean
 }
 
 export interface TimeSlotsCoords {

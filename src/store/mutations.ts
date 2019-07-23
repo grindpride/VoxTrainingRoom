@@ -39,19 +39,6 @@ export const mutations: MutationTree<State> = {
     }
   },
 
-  setCoords(state, {startTime, endTime}) {
-    state.currentEvent.startTime = startTime;
-    state.currentEvent.endTime = endTime;
-
-    const {top, bottom}: EventCoords = getCoordsByTime(<TimeSlotsCoords[]>(state.timeSlotsCoords), {
-      startTime,
-      endTime
-    });
-
-    state.currentEvent.styles.top = `${top}px`;
-    state.currentEvent.styles.height = `${bottom - top}px`;
-  },
-
   setTimeInterval(state, {top, bottom}) {
     const {startTime, endTime}: EventTimeInterval = getTimeByCoords(<TimeSlotsCoords[]>state.timeSlotsCoords, {
       top,
