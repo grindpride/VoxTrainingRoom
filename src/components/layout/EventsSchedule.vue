@@ -186,15 +186,9 @@ import {ResizingType} from "../../lib/enums";
 
       if (this.isCreatingEvent) {
 
-        if (!this.resizing) {
-          const vectorHeight = this.currentEvent.meta.vectorHeight + scrollDiff;
+        const vectorHeight = this.currentEvent.meta.vectorHeight + scrollDiff;
+        this.setVectorHeight(vectorHeight);
 
-          this.setVectorHeight(vectorHeight);
-        } else {
-          const newVH = this.currentEvent.meta.vectorHeight - (this.resizing === ResizingType.Top ? scrollDiff : -scrollDiff);
-
-          this.setVectorHeight(newVH);
-        }
 
         this.lastScrollTop = this.currentScrollTop;
 
@@ -212,15 +206,8 @@ import {ResizingType} from "../../lib/enums";
         const currentMousePoint = e.pageY;
         const mouseDiff = currentMousePoint - this.lastMousePoint;
 
-        if (!this.resizing) {
-          const vectorHeight = this.currentEvent.meta.vectorHeight + mouseDiff;
-
-          this.setVectorHeight(vectorHeight);
-        } else {
-          const newVH = this.currentEvent.meta.vectorHeight + mouseDiff;
-
-          this.setVectorHeight(newVH);
-        }
+        const vectorHeight = this.currentEvent.meta.vectorHeight + mouseDiff;
+        this.setVectorHeight(vectorHeight);
 
         this.lastMousePoint = currentMousePoint;
 
@@ -263,13 +250,12 @@ import {ResizingType} from "../../lib/enums";
             this.$root.$emit('openmodal');
           } else {
             this.editExistingEvent(this.currentEvent);
-            this.resetEvent()
-
-            this.resizing = false;
+            this.resetEvent();
           }
         }
       }
 
+      this.resizing = false;
       this.isIntersecting = false;
       this.isCreatingEvent = false;
     }
