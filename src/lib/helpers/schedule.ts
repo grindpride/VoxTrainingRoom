@@ -97,25 +97,27 @@ export const hasCoordsIntersect = (coords1: EventStyles, coords2: EventStyles): 
   const coords1Bottom = coords1.top + coords1.height;
   const coords2Bottom = coords2.top + coords2.height;
 
+  const isIntersecting = ((coords1.top > coords2.top && coords1.top < coords2Bottom) ||
+    (coords1Bottom > coords2.top && coords1.top < coords2.top) ||
+    (coords1.top < coords2Bottom && coords1Bottom > coords2Bottom));
 
-  return ((coords1.top >= coords2.top && coords1.top <= coords2Bottom) ||
-    (coords1Bottom >= coords2.top && coords1.top <= coords2.top) ||
-    (coords1.top <= coords2Bottom && coords1Bottom >= coords2Bottom))
+
+  return isIntersecting;
 };
 
 export const getIntersectingEvents = (events: ScheduleEvent[], {top: eventTop, height: eventHeight, id: eventId}: EventStyles & { id: number }): ScheduleEvent[] | undefined => {
   if (events && events.length) {
     return events
-      .filter(({styles, id}) => id !== eventId && hasCoordsIntersect({top: eventTop, height: eventHeight}, {
+      .filter(({styles, id}) => id !== eventId && hasCoordsIntersect({
         top: parseInt(styles.top, 10),
         height: parseInt(styles.height, 10)
-      }))
+      }, {top: eventTop, height: eventHeight}))
   }
 
   return undefined;
 };
 
-export const getClosestIntersectingEventCoords = (events: ScheduleEvent[], {top, height, id}: EventStyles & {id: number}): EventStyles | undefined => {
+export const getClosestIntersectingEventCoords = (events: ScheduleEvent[], {top, height, id}: EventStyles & { id: number }): EventStyles | undefined => {
   if (events && events.length) {
     const bottom = top + height;
 

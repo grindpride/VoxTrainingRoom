@@ -250,7 +250,7 @@ import {MonthTypes} from "../../lib/enums";
     }
 
     &.design {
-      background: #ff467e;
+      background: #3D83F9;
     }
   }
 

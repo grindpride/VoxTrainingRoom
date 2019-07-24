@@ -70,6 +70,8 @@ export const mutations: MutationTree<State> = {
     const dateStr = state.activeDate.toDateString();
     const currentDateEvents = state.events[dateStr];
 
+    console.log(event.id);
+
     if (currentDateEvents && currentDateEvents.length) {
       state.events[dateStr] = currentDateEvents
         .filter((ev: ScheduleEvent) => event.id !== ev.id)

@@ -24,15 +24,15 @@ import {ResizingType} from "../../lib/enums";
           :style="event.styles")
           .event__resizer_up(
             @mousedown.stop="resizeEvent($event, 'top', event)"
-            :class="{'hoverEnabled': parseInt(currentEvent.styles.height) === 0}")
+            :class="{'hoverEnabled': parseInt(eventStyles.height) === 0}")
 
           .event__resizer_down(
             @mousedown.stop="resizeEvent($event, 'bottom', event)"
-            :class="{'hoverEnabled': parseInt(currentEvent.styles.height) === 0}")
+            :class="{'hoverEnabled': parseInt(eventStyles.height) === 0}")
 
           .event__task(
             @mousedown.left.stop="editEvent(event)"
-            :class="{[event.type.toLowerCase()]: true, 'hoverEnabled': parseInt(eventStyles.height) === 0}")
+            :class="{[event.type.toLowerCase()]: true, 'hoverEnabled': !isCreatingOrResizingEvent}")
             p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
             span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
         .event__wrapper(:style="eventStyles")
@@ -67,6 +67,7 @@ import {ResizingType} from "../../lib/enums";
     @Mutation setCurrentEvent!: (event: ScheduleEvent) => void;
     @Mutation('editEvent') editExistingEvent: (event: ScheduleEvent) => void;
     @Mutation resetEvent!: () => void;
+    @Mutation deleteEvent!: (event: ScheduleEvent) => void;
 
     @Mutation setStartingPoint!: (value: number) => void;
     @Mutation setVectorHeight!: (value: number) => void;
@@ -183,6 +184,10 @@ import {ResizingType} from "../../lib/enums";
       return {top: `${newTop}px`, height: `${newHeight}px`}
     }
 
+    private get isCreatingOrResizingEvent(): boolean {
+      return !!parseInt(this.eventStyles.height, 10) || !!this.resizing;
+    }
+
     private resetCoords() {
       this.vectorHeight = 0;
       this.startingPoint = 0;
@@ -193,11 +198,9 @@ import {ResizingType} from "../../lib/enums";
       const scrollDiff = this.currentScrollTop - this.lastScrollTop;
 
       if (this.isCreatingEvent) {
+        const vectorHeight = this.vectorHeight + scrollDiff;
 
-        const vectorHeight = this.currentEvent.meta.vectorHeight + scrollDiff;
-        this.setVectorHeight(vectorHeight);
-
-
+        this.vectorHeight = vectorHeight;
         this.lastScrollTop = this.currentScrollTop;
       }
     }
@@ -220,6 +223,10 @@ import {ResizingType} from "../../lib/enums";
     }
 
     private startEventSelection(e: MouseEvent) {
+      if (this.resizing) {
+        return false;
+      }
+
       this.lastMousePoint = e.pageY;
       this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
 
@@ -240,22 +247,25 @@ import {ResizingType} from "../../lib/enums";
     private stopEventSelection() {
       const height: number = parseInt(this.eventStyles.height, 10);
 
-      if (height) {
-        const top: number = parseInt(this.eventStyles.top, 10);
-        const bottom: number = top + height;
 
-        this.setTimeInterval({top, bottom});
+      const top: number = parseInt(this.eventStyles.top, 10);
+      const bottom: number = top + height;
 
-        if (this.isCreatingEvent) {
-          this.setVectorHeight(parseInt(this.eventStyles.height, 10));
-          this.setStartingPoint(this.startingPoint);
-          this.setEventStyles(this.eventStyles);
+      this.setTimeInterval({top, bottom});
 
-          if (!this.resizing) {
-            this.$root.$emit('openmodal', this.currentEvent);
+      if (this.isCreatingEvent) {
+        this.setVectorHeight(parseInt(this.eventStyles.height, 10));
+        this.setStartingPoint(this.startingPoint);
+        this.setEventStyles(this.eventStyles);
+
+        if (!this.resizing) {
+          this.$root.$emit('openmodal', this.currentEvent);
+        } else {
+          if (!height) {
+            this.deleteEvent(this.currentEvent);
+            this.resetEvent();
           } else {
             this.editExistingEvent(this.currentEvent);
-            this.resetEvent();
             this.resetCoords();
           }
         }
@@ -267,6 +277,10 @@ import {ResizingType} from "../../lib/enums";
     }
 
     private editEvent(event: ScheduleEvent) {
+      if (this.resizing) {
+        return false;
+      }
+
       this.$root.$emit('openmodal', event);
     }
 
@@ -280,15 +294,13 @@ import {ResizingType} from "../../lib/enums";
       this.setCurrentEvent({...event});
 
       this.startingPoint = this.resizing === ResizingType.Top
-        ? parseInt(this.currentEvent.styles.top, 10) + parseInt(this.currentEvent.styles.height, 10)
-        : parseInt(this.currentEvent.styles.top);
+        ? parseInt(event.styles.top, 10) + parseInt(event.styles.height, 10)
+        : parseInt(event.styles.top);
 
       this.vectorHeight = this.resizing === ResizingType.Top
         ? -Math.abs(event.meta.vectorHeight)
         : Math.abs(event.meta.vectorHeight);
 
-      this.setVectorHeight(this.vectorHeight);
-      this.setStartingPoint(this.startingPoint);
       event.isResizing = true;
     }
 
@@ -413,8 +425,8 @@ import {ResizingType} from "../../lib/enums";
       display: flex;
       flex-direction: column;
       justify-content: center;
-      transition: background 0.3s ease;
-      transition: opacity 0.3s ease;
+      transition: background 0s ease;
+      transition: opacity 0s ease;
 
       &.default,
       &.design,
@@ -427,7 +439,6 @@ import {ResizingType} from "../../lib/enums";
         opacity: 0.15;
         background: var(--grey-blue);
         border-left: 4px solid var(--dark-blue-100);
-
       }
 
       &.finance {
@@ -443,6 +454,10 @@ import {ResizingType} from "../../lib/enums";
       &.management {
         background: rgba(238, 165, 124, 0.15);
         border-left: 4px solid #eea57c;
+      }
+
+      &.hoverEnabled {
+        transition: background 0.3s ease;
       }
 
       &.finance.hoverEnabled:hover {
