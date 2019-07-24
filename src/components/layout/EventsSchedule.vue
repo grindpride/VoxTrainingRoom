@@ -34,13 +34,13 @@ import {ResizingType} from "../../lib/enums";
             @mousedown.left.stop="editEvent(event)"
             :class="{[event.type.toLowerCase()]: true, 'hoverEnabled': !isCreatingOrResizingEvent}")
             .event__text
-              p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
-              span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
+              p(v-show="parseInt(event.styles.height, 10) > 50") {{event.name}}
+              span(v-if="event.desc && parseInt(event.styles.height, 10) > 71") {{event.desc}}
         .event__wrapper(:style="eventStyles")
           .event__task(:class="currentEvent.type ? currentEvent.type.toLowerCase() : 'default'")
             .event__text
-              p(v-show="parseInt(currentEvent.styles.height, 10) > 24") {{currentEvent.name}}
-              span(v-if="currentEvent.desc && parseInt(currentEvent.styles.height, 10) > 51") {{currentEvent.desc}}
+              p(v-show="parseInt(eventStyles.height, 10) > 50") {{currentEvent.name}}
+              span(v-if="currentEvent.desc && parseInt(eventStyles.height, 10) > 71") {{currentEvent.desc}}
 </template>
 
 <script lang="ts">
@@ -256,16 +256,17 @@ import {ResizingType} from "../../lib/enums";
       this.setTimeInterval({top, bottom});
 
       if (this.isCreatingEvent) {
-        this.setVectorHeight(parseInt(this.eventStyles.height, 10));
-        this.setStartingPoint(this.startingPoint);
-        this.setEventStyles(this.eventStyles);
+        if (height) {
+          this.setVectorHeight(parseInt(this.eventStyles.height, 10));
+          this.setStartingPoint(this.startingPoint);
+          this.setEventStyles(this.eventStyles);
+        }
 
-        if (!this.resizing) {
+        if (!this.resizing && height) {
           this.$root.$emit('openmodal', this.currentEvent);
         } else {
           if (!height) {
             this.deleteEvent(this.currentEvent);
-            this.resetEvent();
           } else {
             this.editExistingEvent(this.currentEvent);
             this.resetCoords();
@@ -273,6 +274,7 @@ import {ResizingType} from "../../lib/enums";
         }
       }
 
+      this.resetEvent();
       this.resizing = false;
       this.isIntersecting = false;
       this.isCreatingEvent = false;
@@ -402,6 +404,7 @@ import {ResizingType} from "../../lib/enums";
     }
 
     &__text {
+      margin-top: 30px;
       padding: 0 35px;
       height: 100%;
       display: flex;
@@ -442,7 +445,6 @@ import {ResizingType} from "../../lib/enums";
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      padding-top: 30px;
 
       transition: background 0s ease;
       transition: opacity 0s ease;
