@@ -404,19 +404,31 @@ import {ResizingType} from "../../lib/enums";
     &__text {
       padding: 0 35px;
       height: 100%;
+      display: flex;
+      position: relative;
+      flex-direction: column;
+
 
       p,
       span {
         overflow: hidden;
-        white-space: nowrap;
+        /*white-space: nowrap;*/
         text-overflow: ellipsis;
+        word-break: break-word;
+        white-space: normal;
       }
 
       p {
         font-size: 18px;
+
       }
 
       span {
+        display: block;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1 0;
         margin-top: 16px;
         font-size: 14px;
         opacity: 0.7;
