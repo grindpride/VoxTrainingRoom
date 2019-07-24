@@ -33,12 +33,14 @@ import {ResizingType} from "../../lib/enums";
           .event__task(
             @mousedown.left.stop="editEvent(event)"
             :class="{[event.type.toLowerCase()]: true, 'hoverEnabled': !isCreatingOrResizingEvent}")
-            p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
-            span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
+            .event__text
+              p(v-show="parseInt(event.styles.height, 10) > 24") {{event.name}}
+              span(v-if="event.desc && parseInt(event.styles.height, 10) > 51") {{event.desc}}
         .event__wrapper(:style="eventStyles")
           .event__task(:class="currentEvent.type ? currentEvent.type.toLowerCase() : 'default'")
-            p(v-show="parseInt(currentEvent.styles.height, 10) > 24") {{currentEvent.name}}
-            span(v-if="currentEvent.desc && parseInt(currentEvent.styles.height, 10) > 51") {{currentEvent.desc}}
+            .event__text
+              p(v-show="parseInt(currentEvent.styles.height, 10) > 24") {{currentEvent.name}}
+              span(v-if="currentEvent.desc && parseInt(currentEvent.styles.height, 10) > 51") {{currentEvent.desc}}
 </template>
 
 <script lang="ts">
@@ -397,26 +399,29 @@ import {ResizingType} from "../../lib/enums";
       width: calc(100% - 80px);
       margin-left: 80px;
       left: 0;
+    }
+
+    &__text {
+      padding: 0 35px;
+      height: 100%;
 
       p,
       span {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        margin-left: 35px;
       }
 
       p {
-        max-width: 260px;
         font-size: 18px;
       }
 
       span {
         margin-top: 16px;
-        max-width: 310px;
         font-size: 14px;
         opacity: 0.7;
       }
+
     }
 
     &__task {
@@ -424,7 +429,9 @@ import {ResizingType} from "../../lib/enums";
       height: 100%;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
+      padding-top: 30px;
+
       transition: background 0s ease;
       transition: opacity 0s ease;
 
