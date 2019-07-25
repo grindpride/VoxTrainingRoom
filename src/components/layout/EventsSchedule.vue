@@ -93,7 +93,7 @@ import {ResizingType} from "../../lib/enums";
     private lastScrollTop: number = 0;
     private movementTimeout: number = 0;
 
-    private closestIntersectingEventCoords: { top: number, height: number } | undefined;
+    private closestIntersectingEventCoords: { top: number, height: number, startingPoint: number, vectorHeight: number } | undefined;
 
 
     private hours: string[] = range(0, 23).map(n => `${n >= 10 ? n : `0${n}`}:00`);
@@ -168,25 +168,32 @@ import {ResizingType} from "../../lib/enums";
       );
 
       if (intersectingEvents && intersectingEvents.length) {
+
         this.closestIntersectingEventCoords = (this.closestIntersectingEventCoords ||
           getClosestIntersectingEventCoords(intersectingEvents, {
             top: newTop,
             height: newHeight,
             id: <number>this.currentEvent.id
-          })) as EventStyles & { id: number };
+          })) as EventStyles & { id: number, startingPoint: number, vectorHeight: number };
 
-
-        if (newTop !== this.startingPoint) {
+        if (this.closestIntersectingEventCoords.startingPoint < this.startingPoint) {
           const topOffset: number = Math.abs(newTop
             - (this.closestIntersectingEventCoords.top + this.closestIntersectingEventCoords.height));
 
           newTop += topOffset;
-          newHeight = this.startingPoint - newTop;
+
+          if (!this.isMovingEvent) {
+            newHeight = this.startingPoint - newTop;
+          }
         } else {
           const heightOffset = (newTop + newHeight) - this.closestIntersectingEventCoords.top;
-          newHeight -= heightOffset
-        }
+          if (this.isMovingEvent) {
+            newTop -= heightOffset;
+          } else {
+            newHeight -= heightOffset;
+          }
 
+        }
       } else {
         this.closestIntersectingEventCoords = undefined;
       }
@@ -312,7 +319,7 @@ import {ResizingType} from "../../lib/enums";
         this.startingPoint = parseInt(event.styles.top, 10);
         this.vectorHeight = 0;
         event.isResizing = true;
-      }, 100);
+      }, 2000);
     }
 
     private resizeEvent(e: MouseEvent, resizingFrom: ResizingType, event: ScheduleEvent) {

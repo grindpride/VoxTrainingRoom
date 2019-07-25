@@ -117,7 +117,7 @@ export const getIntersectingEvents = (events: ScheduleEvent[], {top: eventTop, h
   return undefined;
 };
 
-export const getClosestIntersectingEventCoords = (events: ScheduleEvent[], {top, height, id}: EventStyles & { id: number }): EventStyles | undefined => {
+export const getClosestIntersectingEventCoords = (events: ScheduleEvent[], {top, height, id}: EventStyles & { id: number }): EventStyles & { startingPoint: number, vectorHeight: number } | undefined => {
   if (events && events.length) {
     const bottom = top + height;
 
@@ -134,7 +134,12 @@ export const getClosestIntersectingEventCoords = (events: ScheduleEvent[], {top,
       return closeCondition ? curr : prev;
     });
 
-    return {top: parseInt(closestEvent.styles.top, 10), height: parseInt(closestEvent.styles.height, 10)}
+    return {
+      top: parseInt(closestEvent.styles.top, 10),
+      height: parseInt(closestEvent.styles.height, 10),
+      startingPoint: closestEvent.meta.startingPoint,
+      vectorHeight: closestEvent.meta.vectorHeight
+    }
   }
 
   return undefined;
