@@ -31,7 +31,8 @@ import {ResizingType} from "../../lib/enums";
             :class="{'hoverEnabled': parseInt(eventStyles.height) === 0}")
 
           .event__task(
-            @mousedown.left.stop="editEvent(event)"
+            @mouseup.left.stop="editEvent(event)"
+            @mousedown.left.stop="moveEvent($event, event)"
             :class="{[event.type.toLowerCase()]: true, 'hoverEnabled': !isCreatingOrResizingEvent}")
             .event__text
               p(v-show="parseInt(event.styles.height, 10) > 50") {{event.name}}
@@ -249,7 +250,6 @@ import {ResizingType} from "../../lib/enums";
     private stopEventSelection() {
       const height: number = parseInt(this.eventStyles.height, 10);
 
-
       const top: number = parseInt(this.eventStyles.top, 10);
       const bottom: number = top + height;
 
@@ -286,6 +286,16 @@ import {ResizingType} from "../../lib/enums";
       }
 
       this.$root.$emit('openmodal', event);
+    }
+
+    private moveEvent(e: MouseEvent, event: ScheduleEvent) {
+      this.lastMousePoint = e.pageY;
+      this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
+      this.isCreatingEvent = true;
+
+      this.setCurrentEvent({...event});
+
+      this.startingPoint = parseInt(event.styles.top, 10);
     }
 
     private resizeEvent(e: MouseEvent, resizingFrom: ResizingType, event: ScheduleEvent) {
@@ -415,7 +425,6 @@ import {ResizingType} from "../../lib/enums";
       p,
       span {
         overflow: hidden;
-        /*white-space: nowrap;*/
         text-overflow: ellipsis;
         word-break: break-word;
         white-space: normal;
