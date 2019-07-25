@@ -31,14 +31,14 @@ import {ResizingType} from "../../lib/enums";
             :class="{'hoverEnabled': parseInt(eventStyles.height) === 0}")
 
           .event__task(
-            @mouseup.left.stop="editEvent(event)"
+            @mouseup.left="editEvent(event)"
             @mousedown.left.stop="moveEvent($event, event)"
             :class="{[event.type.toLowerCase()]: true, 'hoverEnabled': !isCreatingOrResizingEvent}")
             .event__text
               p(v-show="parseInt(event.styles.height, 10) > 50") {{event.name}}
               span(v-if="event.desc && parseInt(event.styles.height, 10) > 71") {{event.desc}}
         .event__wrapper(:style="eventStyles")
-          .event__task(:class="currentEvent.type ? currentEvent.type.toLowerCase() : 'default'")
+          .event__task(:class="[currentEvent.type ? currentEvent.type.toLowerCase() : 'default', {isMoving: isMovingEvent}]")
             .event__text
               p(v-show="parseInt(eventStyles.height, 10) > 50") {{currentEvent.name}}
               span(v-if="currentEvent.desc && parseInt(eventStyles.height, 10) > 71") {{currentEvent.desc}}
@@ -82,6 +82,8 @@ import {ResizingType} from "../../lib/enums";
 
     private isCreatingEvent: boolean = false;
     private isIntersecting: boolean = false;
+    private resizing: ResizingType | false;
+    private isMovingEvent: boolean = false;
 
     private scheduleContainer: HTMLElement | null = null;
     private containerTop: number = 0;
@@ -89,10 +91,10 @@ import {ResizingType} from "../../lib/enums";
     private currentScrollTop: number = 0;
     private lastMousePoint: number = 0;
     private lastScrollTop: number = 0;
+    private movementTimeout: number = 0;
 
     private closestIntersectingEventCoords: { top: number, height: number } | undefined;
 
-    private resizing: ResizingType | false;
 
     private hours: string[] = range(0, 23).map(n => `${n >= 10 ? n : `0${n}`}:00`);
 
@@ -154,6 +156,11 @@ import {ResizingType} from "../../lib/enums";
         : this.startingPoint - Math.abs(this.vectorHeight);
 
       let newHeight = Math.abs(this.vectorHeight);
+
+      if (this.isMovingEvent) {
+        newTop = this.startingPoint + this.vectorHeight;
+        newHeight = parseInt(this.currentEvent.styles.height, 10);
+      }
 
 
       const intersectingEvents = getIntersectingEvents(this.currentDateEvents,
@@ -230,6 +237,7 @@ import {ResizingType} from "../../lib/enums";
         return false;
       }
 
+
       this.lastMousePoint = e.pageY;
       this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
 
@@ -262,9 +270,9 @@ import {ResizingType} from "../../lib/enums";
           this.setEventStyles(this.eventStyles);
         }
 
-        if (!this.resizing && height) {
+        if (!this.resizing && !this.isMovingEvent && height) {
           this.$root.$emit('openmodal', this.currentEvent);
-        } else {
+        } else if (this.resizing || this.isMovingEvent) {
           if (!height) {
             this.deleteEvent(this.currentEvent);
           } else {
@@ -278,10 +286,14 @@ import {ResizingType} from "../../lib/enums";
       this.resizing = false;
       this.isIntersecting = false;
       this.isCreatingEvent = false;
+      this.isMovingEvent = false;
+      this.currentEvent.isResizing = false;
     }
 
     private editEvent(event: ScheduleEvent) {
-      if (this.resizing) {
+      clearTimeout(this.movementTimeout);
+
+      if (this.resizing || this.isMovingEvent) {
         return false;
       }
 
@@ -289,13 +301,18 @@ import {ResizingType} from "../../lib/enums";
     }
 
     private moveEvent(e: MouseEvent, event: ScheduleEvent) {
-      this.lastMousePoint = e.pageY;
-      this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
-      this.isCreatingEvent = true;
+      this.movementTimeout = setTimeout(() => {
+        this.isMovingEvent = true;
+        this.lastMousePoint = e.pageY;
+        this.lastScrollTop = (<HTMLElement>this.scheduleContainer).scrollTop;
+        this.isCreatingEvent = true;
 
-      this.setCurrentEvent({...event});
+        this.setCurrentEvent({...event});
 
-      this.startingPoint = parseInt(event.styles.top, 10);
+        this.startingPoint = parseInt(event.styles.top, 10);
+        this.vectorHeight = 0;
+        event.isResizing = true;
+      }, 100);
     }
 
     private resizeEvent(e: MouseEvent, resizingFrom: ResizingType, event: ScheduleEvent) {
@@ -463,6 +480,10 @@ import {ResizingType} from "../../lib/enums";
       &.finance,
       &.management {
         cursor: pointer;
+
+        &.isMoving:hover {
+          cursor: move !important;
+        }
       }
 
       &.default {
@@ -503,6 +524,7 @@ import {ResizingType} from "../../lib/enums";
       &.management.hoverEnabled:hover {
         background: rgba(238, 165, 124, 0.3);
       }
+
     }
 
 
