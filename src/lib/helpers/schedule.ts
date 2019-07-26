@@ -94,8 +94,10 @@ export const checkIfEventsIntersectByTime = (events: ScheduleEvent[], event: Sch
 };
 
 export const getTopAndBottomBorders = (events: ScheduleEvent[] = [], {startingPoint, id}: { startingPoint: number, id: number }) => {
-  if (events && events.length) {
-    const topBorderEvent = events.filter(ev => ev.id !== id).reduce((prev, curr) => {
+  const filteredEvents = events.filter(ev => ev.id !== id);
+
+  if (filteredEvents && filteredEvents.length) {
+    const topBorderEvent = filteredEvents.reduce((prev, curr) => {
       const prevEventBottom = parseInt(prev.styles.top, 10) + parseInt(prev.styles.height, 10);
       const currEventBottom = parseInt(curr.styles.top, 10) + parseInt(curr.styles.height, 10);
 
@@ -108,7 +110,7 @@ export const getTopAndBottomBorders = (events: ScheduleEvent[] = [], {startingPo
     let topBorder = parseInt(topBorderEvent.styles.top, 10) + parseInt(topBorderEvent.styles.height, 10);
     topBorder = topBorder < startingPoint ? topBorder : 0;
 
-    const bottomBorderEvent = events.filter(ev => ev.id !== id).reduce((prev, curr) => {
+    const bottomBorderEvent = filteredEvents.reduce((prev, curr) => {
       const prevEventTop = parseInt(prev.styles.top, 10);
       const currEventTop = parseInt(curr.styles.top, 10);
 
@@ -122,5 +124,7 @@ export const getTopAndBottomBorders = (events: ScheduleEvent[] = [], {startingPo
 
     return {topBorder, bottomBorder}
   }
+
+  return null;
 
 };

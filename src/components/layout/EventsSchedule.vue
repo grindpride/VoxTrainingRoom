@@ -24,11 +24,11 @@ import {ResizingType} from "../../lib/enums";
           :style="event.styles")
           .event__resizer_up(
             @mousedown.stop="resizeEvent($event, 'top', event)"
-            :class="{'hoverEnabled': parseInt(eventStyles.height) === 0}")
+            :class="{'hoverEnabled': !isCreatingOrResizingEvent}")
 
           .event__resizer_down(
             @mousedown.stop="resizeEvent($event, 'bottom', event)"
-            :class="{'hoverEnabled': parseInt(eventStyles.height) === 0}")
+            :class="{'hoverEnabled': !isCreatingOrResizingEvent}")
 
           .event__task(
             @mouseup.left="editEvent(event)"
@@ -50,10 +50,10 @@ import {ResizingType} from "../../lib/enums";
 
   import SvgIcon from '@/components/ui/SvgIcon.vue';
   import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
-  import {getTopAndBottomBorders} from "@/lib/helpers/schedule";
   import {range} from "@/lib/helpers/common";
   import {nineAMTopPosition} from "@/lib/consts";
   import {ResizingType} from '@/lib/enums';
+  import {getTopAndBottomBorders} from "@/lib/helpers/schedule";
 
   @Component({
     components: {SvgIcon}
@@ -168,6 +168,7 @@ import {ResizingType} from "../../lib/enums";
         newHeight = parseInt(this.currentEvent.styles.height, 10);
       }
 
+
       const isCrossingTopBorder = this.borders && newTop <= this.borders.topBorder;
       const isCrossingBottomBorder = this.borders && newTop + newHeight > this.borders.bottomBorder;
 
@@ -182,23 +183,27 @@ import {ResizingType} from "../../lib/enums";
             newHeight = maxHeight;
           }
         } else if (isCrossingBottomBorder) {
-          const maxHeight = Math.abs(this.borders.bottomBorder - this.startingPoint);
           if (this.isMovingEvent) {
             newTop = Math.abs(this.borders.bottomBorder - parseInt(this.currentEvent.styles.height, 10));
-          } else {
+          }  else {
+            const maxHeight = Math.abs(this.borders.bottomBorder - this.startingPoint);
+
             newHeight = maxHeight;
           }
-
         }
       } else {
         this.closestIntersectingEventCoords = undefined;
+      }
+
+      if (newTop === this.paddingHeight && newHeight === this.paddingHeight) {
+        newTop = newHeight = 0;
       }
 
       return {top: `${newTop}px`, height: `${newHeight}px`}
     }
 
     private get isCreatingOrResizingEvent(): boolean {
-      return !!parseInt(this.eventStyles.height, 10) || !!this.resizing;
+      return parseInt(this.eventStyles.height, 10) > this.paddingHeight || !!this.resizing;
     }
 
     private get borders() {
@@ -207,7 +212,7 @@ import {ResizingType} from "../../lib/enums";
         id: Number(this.currentEvent.id)
       });
 
-      const topBorder = (coords && coords.topBorder) || 0;
+      const topBorder = (coords && coords.topBorder) || this.paddingHeight;
       const bottomBorder = (coords && coords.bottomBorder) || this.containerBottom;
 
       return {
@@ -330,7 +335,7 @@ import {ResizingType} from "../../lib/enums";
         this.startingPoint = parseInt(event.styles.top, 10);
         this.vectorHeight = 0;
         event.isResizing = true;
-      }, 2000);
+      }, 600);
     }
 
     private resizeEvent(e: MouseEvent, resizingFrom: ResizingType, event: ScheduleEvent) {
