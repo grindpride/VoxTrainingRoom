@@ -157,7 +157,7 @@ import {ResizingType} from "../../lib/enums";
       return coords;
     }
 
-    private get eventStyles(): { top: string, height: string } {
+    private get eventStyles(): { top: string, height: string, cursor?: string } {
       let newTop = this.vectorHeight > 0 ? this.startingPoint
         : this.startingPoint - Math.abs(this.vectorHeight);
 
@@ -185,7 +185,7 @@ import {ResizingType} from "../../lib/enums";
         } else if (isCrossingBottomBorder) {
           if (this.isMovingEvent) {
             newTop = Math.abs(this.borders.bottomBorder - parseInt(this.currentEvent.styles.height, 10));
-          }  else {
+          } else {
             const maxHeight = Math.abs(this.borders.bottomBorder - this.startingPoint);
 
             newHeight = maxHeight;
@@ -199,7 +199,7 @@ import {ResizingType} from "../../lib/enums";
         newTop = newHeight = 0;
       }
 
-      return {top: `${newTop}px`, height: `${newHeight}px`}
+      return {top: `${newTop}px`, height: `${newHeight}px`, ...(this.isMovingEvent && {cursor: 'move'})}
     }
 
     private get isCreatingOrResizingEvent(): boolean {
@@ -495,8 +495,7 @@ import {ResizingType} from "../../lib/enums";
       flex-direction: column;
       justify-content: flex-start;
 
-      transition: background 0s ease;
-      transition: opacity 0s ease;
+      transition: background 0s ease, opacity 0s ease;
 
       &.default,
       &.design,
