@@ -49,8 +49,8 @@ import {ResizingType} from "../../lib/enums";
   import {Getter, Mutation, State} from 'vuex-class'
 
   import SvgIcon from '@/components/ui/SvgIcon.vue';
-  import {EventCoords, EventStyles, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
-  import {getClosestIntersectingEventCoords, getIntersectingEvents} from "@/lib/helpers/schedule";
+  import {EventCoords, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
+  import {getTopAndBottomBorders} from "@/lib/helpers/schedule";
   import {range} from "@/lib/helpers/common";
   import {nineAMTopPosition} from "@/lib/consts";
   import {ResizingType} from '@/lib/enums';
@@ -87,6 +87,7 @@ import {ResizingType} from "../../lib/enums";
 
     private scheduleContainer: HTMLElement | null = null;
     private containerTop: number = 0;
+    private containerBottom: number = 0;
     private paddingHeight: number = 0;
     private currentScrollTop: number = 0;
     private lastMousePoint: number = 0;
@@ -111,8 +112,12 @@ import {ResizingType} from "../../lib/enums";
 
     mounted(): void {
       this.scheduleContainer = <HTMLElement>this.$refs.scheduleContainer;
+      const containerCoords = this.scheduleContainer.getBoundingClientRect();
+
       this.scheduleContainer.addEventListener('scroll', this.handleScroll);
-      this.containerTop = this.scheduleContainer.getBoundingClientRect().top;
+
+      this.containerTop = containerCoords.top;
+
       this.paddingHeight = parseInt(
         <string>window.getComputedStyle(this.scheduleContainer).paddingTop,
         10
@@ -120,6 +125,7 @@ import {ResizingType} from "../../lib/enums";
 
       const timeSlotsCoords = this.getTimeSlotsCoords();
       this.setTimeSlotCoords(timeSlotsCoords);
+      this.containerBottom = parseInt(timeSlotsCoords[timeSlotsCoords.length - 1].bottom, 10);
 
       (<HTMLElement>this.scheduleContainer).scrollTo(0, nineAMTopPosition);
 
@@ -162,35 +168,25 @@ import {ResizingType} from "../../lib/enums";
         newHeight = parseInt(this.currentEvent.styles.height, 10);
       }
 
+      const isCrossingTopBorder = this.borders && newTop <= this.borders.topBorder;
+      const isCrossingBottomBorder = this.borders && newTop + newHeight > this.borders.bottomBorder;
 
-      const intersectingEvents = getIntersectingEvents(this.currentDateEvents,
-        {top: newTop, height: newHeight, id: <number>this.currentEvent.id}
-      );
+      const withinBorders = isCrossingTopBorder || isCrossingBottomBorder;
 
-      if (intersectingEvents && intersectingEvents.length) {
-
-        this.closestIntersectingEventCoords = (this.closestIntersectingEventCoords ||
-          getClosestIntersectingEventCoords(intersectingEvents, {
-            top: newTop,
-            height: newHeight,
-            id: <number>this.currentEvent.id
-          })) as EventStyles & { id: number, startingPoint: number, vectorHeight: number };
-
-        if (this.closestIntersectingEventCoords.startingPoint < this.startingPoint) {
-          const topOffset: number = Math.abs(newTop
-            - (this.closestIntersectingEventCoords.top + this.closestIntersectingEventCoords.height));
-
-          newTop += topOffset;
+      if (withinBorders) {
+        if (isCrossingTopBorder) {
+          newTop = this.borders.topBorder;
 
           if (!this.isMovingEvent) {
-            newHeight = this.startingPoint - newTop;
+            const maxHeight = Math.abs(this.startingPoint - this.borders.topBorder);
+            newHeight = maxHeight;
           }
-        } else {
-          const heightOffset = (newTop + newHeight) - this.closestIntersectingEventCoords.top;
+        } else if (isCrossingBottomBorder) {
+          const maxHeight = Math.abs(this.borders.bottomBorder - this.startingPoint);
           if (this.isMovingEvent) {
-            newTop -= heightOffset;
+            newTop = Math.abs(this.borders.bottomBorder - parseInt(this.currentEvent.styles.height, 10));
           } else {
-            newHeight -= heightOffset;
+            newHeight = maxHeight;
           }
 
         }
@@ -203,6 +199,21 @@ import {ResizingType} from "../../lib/enums";
 
     private get isCreatingOrResizingEvent(): boolean {
       return !!parseInt(this.eventStyles.height, 10) || !!this.resizing;
+    }
+
+    private get borders() {
+      const coords = getTopAndBottomBorders(this.currentDateEvents, {
+        startingPoint: this.startingPoint,
+        id: Number(this.currentEvent.id)
+      });
+
+      const topBorder = (coords && coords.topBorder) || 0;
+      const bottomBorder = (coords && coords.bottomBorder) || this.containerBottom;
+
+      return {
+        topBorder,
+        bottomBorder
+      };
     }
 
     private resetCoords() {

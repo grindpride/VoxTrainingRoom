@@ -93,54 +93,34 @@ export const checkIfEventsIntersectByTime = (events: ScheduleEvent[], event: Sch
   return false;
 };
 
-export const hasCoordsIntersect = (coords1: EventStyles, coords2: EventStyles): boolean => {
-  const coords1Bottom = coords1.top + coords1.height;
-  const coords2Bottom = coords2.top + coords2.height;
-
-  const isIntersecting = ((coords1.top > coords2.top && coords1.top < coords2Bottom) ||
-    (coords1Bottom > coords2.top && coords1.top < coords2.top) ||
-    (coords1.top < coords2Bottom && coords1Bottom > coords2Bottom));
-
-
-  return isIntersecting;
-};
-
-export const getIntersectingEvents = (events: ScheduleEvent[], {top: eventTop, height: eventHeight, id: eventId}: EventStyles & { id: number }): ScheduleEvent[] | undefined => {
+export const getTopAndBottomBorders = (events: ScheduleEvent[] = [], {startingPoint, id}: { startingPoint: number, id: number }) => {
   if (events && events.length) {
-    return events
-      .filter(({styles, id}) => id !== eventId && hasCoordsIntersect({
-        top: parseInt(styles.top, 10),
-        height: parseInt(styles.height, 10)
-      }, {top: eventTop, height: eventHeight}))
-  }
+    const topBorderEvent = events.filter(ev => ev.id !== id).reduce((prev, curr) => {
+      const prevEventBottom = parseInt(prev.styles.top, 10) + parseInt(prev.styles.height, 10);
+      const currEventBottom = parseInt(curr.styles.top, 10) + parseInt(curr.styles.height, 10);
 
-  return undefined;
-};
-
-export const getClosestIntersectingEventCoords = (events: ScheduleEvent[], {top, height, id}: EventStyles & { id: number }): EventStyles & { startingPoint: number, vectorHeight: number } | undefined => {
-  if (events && events.length) {
-    const bottom = top + height;
-
-    const closestEvent = events.filter(ev => ev.id !== id).reduce((prev, curr) => {
-      const prevTop = parseInt(prev.styles.top, 10);
-      const currTop = parseInt(curr.styles.top, 10);
-
-      const prevBottom = prevTop + parseInt(prev.styles.height, 10);
-      const currBottom = currTop + parseInt(curr.styles.height, 10);
-
-      const closeCondition = Math.abs(top - currTop) < Math.abs(top - prevTop) ||
-        Math.abs(bottom - currBottom) < Math.abs(bottom - prevBottom);
+      const closeCondition = Math.abs(startingPoint - currEventBottom) < Math.abs(startingPoint - prevEventBottom);
 
       return closeCondition ? curr : prev;
     });
 
-    return {
-      top: parseInt(closestEvent.styles.top, 10),
-      height: parseInt(closestEvent.styles.height, 10),
-      startingPoint: closestEvent.meta.startingPoint,
-      vectorHeight: closestEvent.meta.vectorHeight
-    }
+
+    let topBorder = parseInt(topBorderEvent.styles.top, 10) + parseInt(topBorderEvent.styles.height, 10);
+    topBorder = topBorder < startingPoint ? topBorder : 0;
+
+    const bottomBorderEvent = events.filter(ev => ev.id !== id).reduce((prev, curr) => {
+      const prevEventTop = parseInt(prev.styles.top, 10);
+      const currEventTop = parseInt(curr.styles.top, 10);
+
+      const closeCondition = Math.abs(startingPoint - currEventTop) < Math.abs(startingPoint - prevEventTop);
+
+      return closeCondition ? curr : prev;
+    });
+
+    let bottomBorder = parseInt(bottomBorderEvent.styles.top);
+    bottomBorder = bottomBorder > startingPoint ? bottomBorder : 0;
+
+    return {topBorder, bottomBorder}
   }
 
-  return undefined;
 };
