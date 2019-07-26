@@ -1,4 +1,4 @@
-import {EventCoords, EventStyles, EventTimeInterval, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
+import {EventCoords, EventTimeInterval, ScheduleEvent, TimeSlotsCoords} from "@/lib/types";
 
 export const createDefaultEvent = (): ScheduleEvent => ({
   name: '',
@@ -93,33 +93,39 @@ export const checkIfEventsIntersectByTime = (events: ScheduleEvent[], event: Sch
   return false;
 };
 
+const checkIfNextValCloser = (valToCompare: number, prevVal: number, nextVal: number) =>
+  Math.abs(valToCompare - nextVal) < Math.abs(valToCompare - prevVal);
+
+
 export const getTopAndBottomBorders = (events: ScheduleEvent[] = [], {startingPoint, id}: { startingPoint: number, id: number }) => {
   const filteredEvents = events.filter(ev => ev.id !== id);
 
   if (filteredEvents && filteredEvents.length) {
-    const topBorderEvent = filteredEvents.reduce((prev, curr) => {
-      const prevEventBottom = parseInt(prev.styles.top, 10) + parseInt(prev.styles.height, 10);
-      const currEventBottom = parseInt(curr.styles.top, 10) + parseInt(curr.styles.height, 10);
+    const eventsCoords = filteredEvents.map(({styles}) => ({
+      top: parseInt(styles.top, 10),
+      height: parseInt(styles.height, 10)
+    }));
 
-      const closeCondition = Math.abs(startingPoint - currEventBottom) < Math.abs(startingPoint - prevEventBottom);
+    const topBorderEvent = eventsCoords.reduce((prev, curr) => {
+      const prevEventBottom = prev.top + prev.height;
+      const currEventBottom = curr.top + curr.height;
 
-      return closeCondition ? curr : prev;
+      const isCurrValCloser = checkIfNextValCloser(startingPoint, prevEventBottom, currEventBottom);
+
+      return isCurrValCloser ? curr : prev;
     });
 
 
-    let topBorder = parseInt(topBorderEvent.styles.top, 10) + parseInt(topBorderEvent.styles.height, 10);
+    let topBorder = topBorderEvent.top + topBorderEvent.height;
     topBorder = topBorder < startingPoint ? topBorder : 0;
 
-    const bottomBorderEvent = filteredEvents.reduce((prev, curr) => {
-      const prevEventTop = parseInt(prev.styles.top, 10);
-      const currEventTop = parseInt(curr.styles.top, 10);
+    const bottomBorderEvent = eventsCoords.reduce((prev, curr) => {
+      const isCurrValCloser = checkIfNextValCloser(startingPoint, prev.top, curr.top);
 
-      const closeCondition = Math.abs(startingPoint - currEventTop) < Math.abs(startingPoint - prevEventTop);
-
-      return closeCondition ? curr : prev;
+      return isCurrValCloser ? curr : prev;
     });
 
-    let bottomBorder = parseInt(bottomBorderEvent.styles.top);
+    let bottomBorder = bottomBorderEvent.top;
     bottomBorder = bottomBorder > startingPoint ? bottomBorder : 0;
 
     return {topBorder, bottomBorder}

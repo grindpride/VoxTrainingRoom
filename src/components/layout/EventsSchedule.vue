@@ -335,7 +335,7 @@ import {ResizingType} from "../../lib/enums";
         this.startingPoint = parseInt(event.styles.top, 10);
         this.vectorHeight = 0;
         event.isResizing = true;
-      }, 600);
+      }, 200);
     }
 
     private resizeEvent(e: MouseEvent, resizingFrom: ResizingType, event: ScheduleEvent) {
