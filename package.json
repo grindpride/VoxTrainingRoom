@@ -11,7 +11,7 @@
     "postcss-discard-comments": "^4.0.0",
     "postcss-focus": "^4.0.0",
     "postcss-mixins": "^6.2.1",
-    "postcss-modules": "^1.1.0",
+    "postcss-modules": "^1.5.0",
     "postcss-nested": "^3.0.0"
   },
   "scripts": {
